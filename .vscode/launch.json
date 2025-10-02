@@ -15,7 +15,7 @@
       "name": "backend",
       "request": "launch",
       "console": "integratedTerminal",
-      "mainClass": "soen342.main.MainApplication",
+      "mainClass": "soen342.project.controller.MainApplication",
       "projectName": "backend",
       "presentation": {
         "order": 1
