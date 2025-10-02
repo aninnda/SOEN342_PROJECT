@@ -1,6 +1,7 @@
-import { CircularProgress, Link } from "@mui/material";
-import { useGetIndexExampleDetailed } from "../queries/exampleQueries";
+import { CircularProgress } from "@mui/material";
 import clsx from "clsx";
+import { useGetIndexExampleDetailed } from "../queries/exampleQueries";
+import ConnectionTable from "../components/ConnectionTable";
 
 /**
  *
@@ -12,7 +13,9 @@ export default function IndexView() {
 
   return (
     <div>
-      <h1>Index Page</h1>
+      <h1 className="mb-5">Index Page</h1>
+
+      <ConnectionTable />
 
       <div>
         <div className="flex gap-2 justify-center">
