@@ -1,21 +1,24 @@
-package soen342.project.models;
+package soen342.project.model;
 
-public class Connection {
+import java.time.DayOfWeek;
+import java.util.List;
+
+public class Route {
     private String routeId;
     private String departureCity;
     private String arrivalCity;
     private String departureTime;
     private String arrivalTime;
     private String trainType;
-    private String daysOfOperation;
+    private List<DayOfWeek> daysOfOperation;
     private int firstClassTicketRate;
     private int secondClassTicketRate;
 
-    public Connection() {
-    }
+    private double tripDuration; // in hours
 
-    public Connection(String routeId, String departureCity, String arrivalCity, String departureTime, String arrivalTime,
-                      String trainType, String daysOfOperation, int firstClassTicketRate, int secondClassTicketRate) {
+    public Route(String routeId, String departureCity, String arrivalCity, String departureTime,
+            String arrivalTime, String trainType, List<DayOfWeek> daysOfOperation,
+            int firstClassTicketRate, int secondClassTicketRate) {
         this.routeId = routeId;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
@@ -25,6 +28,13 @@ public class Connection {
         this.daysOfOperation = daysOfOperation;
         this.firstClassTicketRate = firstClassTicketRate;
         this.secondClassTicketRate = secondClassTicketRate;
+        this.tripDuration = calculateRouteDuration(departureTime, arrivalTime);
+    }
+
+
+    private double calculateRouteDuration(String departureTime, String arrivalTime) {
+        // TODO implement route duration calculation
+        return 0;
     }
 
     public String getRouteId() {
@@ -57,6 +67,7 @@ public class Connection {
 
     public void setDepartureTime(String departureTime) {
         this.departureTime = departureTime;
+        this.tripDuration = calculateRouteDuration(this.departureTime, this.arrivalTime);
     }
 
     public String getArrivalTime() {
@@ -65,6 +76,7 @@ public class Connection {
 
     public void setArrivalTime(String arrivalTime) {
         this.arrivalTime = arrivalTime;
+        this.tripDuration = calculateRouteDuration(this.departureTime, this.arrivalTime);
     }
 
     public String getTrainType() {
@@ -75,11 +87,11 @@ public class Connection {
         this.trainType = trainType;
     }
 
-    public String getDaysOfOperation() {
+    public List<DayOfWeek> getDaysOfOperation() {
         return daysOfOperation;
     }
 
-    public void setDaysOfOperation(String daysOfOperation) {
+    public void setDaysOfOperation(List<DayOfWeek> daysOfOperation) {
         this.daysOfOperation = daysOfOperation;
     }
 
@@ -97,5 +109,13 @@ public class Connection {
 
     public void setSecondClassTicketRate(int secondClassTicketRate) {
         this.secondClassTicketRate = secondClassTicketRate;
+    }
+
+    public double getTripDuration() {
+        return tripDuration;
+    }
+
+    public void setTripDuration(double tripDuration) {
+        this.tripDuration = tripDuration;
     }
 }

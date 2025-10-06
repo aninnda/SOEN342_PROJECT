@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import ConnectionTable from "../components/ConnectionTable";
+import ConnectionTable from "../components/tables/ConnectionTable";
 
 /**
  *

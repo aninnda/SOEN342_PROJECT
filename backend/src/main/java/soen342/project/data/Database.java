@@ -3,17 +3,20 @@ package soen342.project.data;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.util.List;
-import java.util.ArrayList;
 
-import soen342.project.models.Connection;
+import soen342.project.model.Route;
+import soen342.project.util.DateTimeUtils;
+
+import java.util.ArrayList;
 
 public class Database {
 
     // TODO use an actual database
-    private static final String CONNECTIONS_CSV_FILE = "src/main/resources/static/eu_rail_network.csv";
+    private static final String ROUTES_CSV_FILE = "src/main/resources/static/eu_rail_network.csv";
 
-    private List<Connection> connections;
+    private List<Route> routes;
 
     private static Database instance;
 
@@ -24,18 +27,18 @@ public class Database {
     public static synchronized Database getInstance() {
         if (instance == null) {
             instance = new Database();
-            instance.readConnectionsFromCSV(CONNECTIONS_CSV_FILE);
+            instance.readRoutesFromCSV(ROUTES_CSV_FILE);
         }
         return instance;
     }
 
-    public List<Connection> getConnections() {
-        return connections;
+    public List<Route> getRoutes() {
+        return routes;
     }
 
     // written with help from Copilot (as a database will likely be used later on)
-    private void readConnectionsFromCSV(String filePath) {
-        connections = new ArrayList<>();
+    private void readRoutesFromCSV(String filePath) {
+        routes = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -51,25 +54,24 @@ public class Database {
                 // Parse CSV line handling quoted values that may contain commas
                 String[] values = parseCSVLine(line);
 
-                String routeId = values[0].trim();
-                String departureCity = values[1].trim();
-                String arrivalCity = values[2].trim();
-                String departureTime = values[3].trim();
-                String arrivalTime = values[4].trim();
-                String trainType = values[5].trim();
-                String daysOfOperation = values[6].trim();
-                int firstClassRate = Integer.parseInt(values[7].trim());
-                int secondClassRate = Integer.parseInt(values[8].trim());
+                String routeId = values[0];
+                String departureCity = values[1];
+                String arrivalCity = values[2];
+                String departureTime = values[3];
+                String arrivalTime = values[4];
+                String trainType = values[5];
+                List<DayOfWeek> daysOfOperation = DateTimeUtils.stringToDays(values[6]);
+                int firstClassRate = Integer.parseInt(values[7]);
+                int secondClassRate = Integer.parseInt(values[8]);
 
-                Connection connection = new Connection(routeId, departureCity, arrivalCity,
-                        departureTime, arrivalTime, trainType,
-                        daysOfOperation, firstClassRate, secondClassRate);
-                connections.add(connection);
+                Route route = new Route(routeId, departureCity, arrivalCity, departureTime, arrivalTime,
+                        trainType, daysOfOperation, firstClassRate, secondClassRate);
+                routes.add(route);
             }
 
         } catch (IOException e) {
             System.err.println("Error reading CSV file: " + e.getMessage());
-            connections = new ArrayList<>(); // Initialize empty list if file reading fails
+            routes = new ArrayList<>(); // Initialize empty list if file reading fails
         }
     }
 

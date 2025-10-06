@@ -7,14 +7,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import soen342.project.models.Connection;
+import soen342.project.model.Requests.SearchCriteria;
+import soen342.project.model.Responses.SearchResponseModel;
 import soen342.project.service.SearchService;
-
-import java.util.List;
 
 @SpringBootApplication
 @RestController
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" })
 public class MainApplication {
 
 	SearchService searchService = new SearchService();
@@ -24,15 +23,28 @@ public class MainApplication {
 	}
 
 	@GetMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-      return String.format("Hello %s!", name);
-    }
-
-	@GetMapping("/search")
-	public List<Connection> getConnections() {
-		// TODO handle search params
-		return searchService.search();
+	public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
+		return String.format("Hello %s!", name);
 	}
 
+	@GetMapping(value = "/search", produces = "application/json")
+	public SearchResponseModel getConnections(
+			@RequestParam(value = "departureCity", required = false) String departureCity,
+			@RequestParam(value = "arrivalCity", required = false) String arrivalCity,
+			@RequestParam(value = "departureDateTime", required = false) String departureDateTime,
+			@RequestParam(value = "arrivalDateTime", required = false) String arrivalDateTime,
+			@RequestParam(value = "trainType", required = false) String trainType,
+			@RequestParam(value = "maxPrice", required = false) String maxPrice) {
+
+		SearchCriteria criteria = new SearchCriteria(
+				departureCity,
+				arrivalCity,
+				departureDateTime,
+				arrivalDateTime,
+				trainType,
+				maxPrice);
+
+		return searchService.search(criteria);
+	}
 
 }
