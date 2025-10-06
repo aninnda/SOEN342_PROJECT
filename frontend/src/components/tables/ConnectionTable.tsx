@@ -1,12 +1,13 @@
 import { useMemo } from "react";
-import type { ConnectionModel } from "../models/models";
-import { getDisplayNameForDaysOfOperation } from "../utils/dateUtils";
+import type { ConnectionModel, RouteModel } from "../../models/models";
+import { getDisplayNameForDaysOfOperation } from "../../utils/dateUtils";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useGetAllConnections } from "../queries/searchQueries";
+import { useGetAllConnections } from "../../queries/searchQueries";
+import IndirectConnectionTable from "./IndirectConnectionTable";
 
 /**
  * Built using https://www.material-react-table.com/docs/getting-started/usage as reference.
@@ -16,48 +17,67 @@ export default function ConnectionTable() {
 
   const allConnectionsQuery = useGetAllConnections();
 
-  const data = useMemo<ConnectionModel[]>(() => {
+  const connections = useMemo<ConnectionModel[]>(() => {
     if (allConnectionsQuery.isSuccess && allConnectionsQuery.data) {
-      return allConnectionsQuery.data;
+      return allConnectionsQuery.data.connections;
     } else {
       return [];
     }
   }, [allConnectionsQuery]);
 
-  const columns = useMemo<MRT_ColumnDef<ConnectionModel>[]>(
+  const routes = useMemo<RouteModel[]>(() => {
+    return connections.map((conn) => conn.routes[0]);
+  }, [connections]);
+
+  const columns = useMemo<MRT_ColumnDef<RouteModel>[]>(
     () => [
       {
         header: "Departure City",
         accessorKey: "departureCity",
+        enableSorting: false,
       },
       {
         header: "Arrival City",
         accessorKey: "arrivalCity",
+        enableSorting: false,
       },
       {
         header: "Departure Time",
         accessorKey: "departureTime",
+        enableSorting: false,
       },
       {
         header: "Arrival Time",
         accessorKey: "arrivalTime",
+        enableSorting: false,
       },
       {
         header: "Train Type",
         accessorKey: "trainType",
+        enableSorting: false,
       },
       {
         header: "Days of Operation",
         accessorKey: "daysOfOperation",
-        Cell: ({ cell }: any) => getDisplayNameForDaysOfOperation(cell.getValue()),
+        enableSorting: false,
+
+        Cell: ({ cell }: any) =>
+          getDisplayNameForDaysOfOperation(cell.getValue()),
       },
       {
         header: "First Class Ticket Rate",
         accessorKey: "firstClassTicketRate",
+        enableSorting: false,
       },
       {
         header: "Second Class Ticket Rate",
         accessorKey: "secondClassTicketRate",
+        enableSorting: false,
+      },
+      {
+        header: "Trip Duration",
+        accessorKey: "tripDuration",
+        enableSorting: true,
       },
     ],
     []
@@ -66,10 +86,7 @@ export default function ConnectionTable() {
   // TODO ask prof about disabling sorting and filtering in ui component
   const table = useMaterialReactTable({
     columns,
-    data,
-
-    // disable sorting
-    enableSorting: false,
+    data: routes,
 
     // disable filtering
     enableColumnFilterModes: false,
@@ -84,5 +101,14 @@ export default function ConnectionTable() {
     muiSearchTextFieldProps: { disabled: true },
   });
 
-  return <MaterialReactTable table={table} />;
+  const displayIndirectTable =
+    allConnectionsQuery.isSuccess &&
+    allConnectionsQuery.data?.containsIndirectConnections === true;
+
+  return (
+    <>
+      {!displayIndirectTable && <MaterialReactTable table={table} />}
+      {displayIndirectTable && <IndirectConnectionTable data={connections} />}
+    </>
+  );
 }

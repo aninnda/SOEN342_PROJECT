@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "./api";
-import type { ConnectionModel } from "../models/models";
+import type { SearchResponseModel } from "../models/responseModels";
 
 // TODO add pagination
 export const useGetAllConnections = () => {
@@ -10,7 +10,7 @@ export const useGetAllConnections = () => {
       api
         .url("/search")
         .get()
-        .json<ConnectionModel[]>()
+        .json<SearchResponseModel>()
         .then((res) => res),
     retry: 1,
   });

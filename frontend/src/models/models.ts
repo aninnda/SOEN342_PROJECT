@@ -1,12 +1,36 @@
-export type ConnectionModel = {
-  routeId: string;
+const DayOfWeek = {
+  MONDAY: "Monday",
+  TUESDAY: "Tuesday",
+  WEDNESDAY: "Wednesday",
+  THURSDAY: "Thursday",
+  FRIDAY: "Friday",
+  SATURDAY: "Saturday",
+  SUNDAY: "Sunday",
+} as const;
+
+export type DayOfWeek = typeof DayOfWeek[keyof typeof DayOfWeek];
+
+
+export type RouteModel = {
   departureCity: string;
   arrivalCity: string;
   departureTime: string; // format is hh:mm
   arrivalTime: string; // format is hh:mm
   trainType: string;
-  daysOfOperation: string;
+  daysOfOperation: DayOfWeek[];
   firstClassTicketRate: number; // in euro
   secondClassTicketRate: number; // in euro
-  tripDuration?: string; // format is hh:mm
+  tripDuration?: number; // format is hh:mm
+}
+
+export type ConnectionModel = {
+  routes: RouteModel[];
+
+  totalMovingDuration: number;
+  connectionChangeDuration: number;
+  totalTripDuration: number;
+  totalFirstClassTicketRate: number;
+  totalSecondClassTicketRate: number;
+  numberOfTransfers: number;
 };
+
