@@ -1,6 +1,5 @@
 package soen342.project.model;
 
-import java.time.LocalTime;
 import java.util.List;
 
 public class Connection {
@@ -13,12 +12,7 @@ public class Connection {
     private int totalFirstClassTicketRate;
     private int totalSecondClassTicketRate;
     private int numberOfTransfers;
-
-    private String departureCity;
-    private String arrivalCity;
-    private String departureTime;
-    private String arrivalTime;
-
+    
     public Connection(List<Route> routes) {
         this.routes = routes;
         this.totalMovingDuration = calculateTotalMovingDuration(routes);
@@ -27,11 +21,6 @@ public class Connection {
         this.totalFirstClassTicketRate = routes.stream().mapToInt(Route::getFirstClassTicketRate).sum();
         this.totalSecondClassTicketRate = routes.stream().mapToInt(Route::getSecondClassTicketRate).sum();
         this.numberOfTransfers = routes.size() - 1;
-
-        this.departureCity = routes.get(0).getDepartureCity();
-        this.arrivalCity = routes.get(routes.size() - 1).getArrivalCity();
-        this.departureTime = routes.get(0).getDepartureTime();
-        this.arrivalTime = routes.get(routes.size() - 1).getArrivalTime();
     }
 
     private double calculateTotalMovingDuration(List<Route> routes) {

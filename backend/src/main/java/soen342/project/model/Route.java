@@ -33,8 +33,36 @@ public class Route {
 
 
     private double calculateRouteDuration(String departureTime, String arrivalTime) {
-        // TODO implement route duration calculation
-        return 0;
+        try {
+            // Parse departure time in format "HH:MM"
+            String[] depParts = departureTime.split(":");
+            int depHour = Integer.parseInt(depParts[0]);
+            int depMin = Integer.parseInt(depParts[1]);
+            
+            // Parse arrival time - handle format "HH:MM (+1d)" for next day
+            boolean isNextDay = arrivalTime.contains("(+1d)");
+            String arrTimeOnly = arrivalTime.replace(" (+1d)", "").trim();
+            String[] arrParts = arrTimeOnly.split(":");
+            int arrHour = Integer.parseInt(arrParts[0]);
+            int arrMin = Integer.parseInt(arrParts[1]);
+            
+            // Convert to total minutes from midnight
+            int depTotalMin = depHour * 60 + depMin;
+            int arrTotalMin = arrHour * 60 + arrMin;
+            
+            // Handle next-day arrivals
+            if (isNextDay || arrTotalMin < depTotalMin) {
+                arrTotalMin += 24 * 60; // Add 24 hours
+            }
+
+            // Calculate duration in minutes
+            int durationMin = arrTotalMin - depTotalMin;
+            return durationMin / 60.0; // Convert to hours with decimal
+            
+        } catch (Exception e) {
+            // If parsing fails, return 0
+            return 0.0;
+        }
     }
 
     public String getRouteId() {
@@ -117,5 +145,19 @@ public class Route {
 
     public void setTripDuration(double tripDuration) {
         this.tripDuration = tripDuration;
+    }
+    
+    // Helper method to get formatted duration string
+    public String getFormattedTripDuration() {
+        int hours = (int) tripDuration;
+        int minutes = (int) ((tripDuration - hours) * 60);
+        
+        if (hours == 0) {
+            return String.format("%dm", minutes);
+        } else if (minutes == 0) {
+            return String.format("%dh", hours);
+        } else {
+            return String.format("%dh %dm", hours, minutes);
+        }
     }
 }

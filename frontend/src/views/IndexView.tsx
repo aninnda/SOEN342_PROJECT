@@ -1,18 +1,42 @@
+import { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import ConnectionTable from "../components/tables/ConnectionTable";
+import SearchInterface from "../components/SearchInterface";
+import type { SearchFilters } from "../queries/searchQueries";
 
 /**
- *
- * TODO: Remove this temporary index page, and route based on login state.
- * @returns A temporary index page.
+ * Main view that combines search interface with results table
  */
 export default function IndexView() {
+  const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearch = (filters: SearchFilters) => {
+    setSearchFilters(filters);
+    setHasSearched(true);
+  };
+
+  const handleClear = () => {
+    setSearchFilters({});
+    setHasSearched(false);
+  };
+
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography variant="h3" align="center" gutterBottom>
-        Available Train Connections
+        Choose your next travel destination!
       </Typography>
-      <ConnectionTable />
+      
+      <SearchInterface onSearch={handleSearch} onClear={handleClear} />
+      
+      {hasSearched && (
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="h5" gutterBottom>
+            Search Results
+          </Typography>
+          <ConnectionTable searchFilters={searchFilters} />
+        </Box>
+      )}
     </Box>
   );
 }
