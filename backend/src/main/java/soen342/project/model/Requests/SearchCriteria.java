@@ -1,33 +1,72 @@
 package soen342.project.model.Requests;
 
-import java.time.LocalDateTime;
+import java.time.DayOfWeek;
 
 public class SearchCriteria {
 
     private String departureCity;
     private String arrivalCity;
-    private LocalDateTime departureDateTime; // mutually exclusive from arrivalDateTime
-    private LocalDateTime arrivalDateTime; // mutually exclusive from departureDateTime
+    private String departureTime; // Format: "HH:MM" (e.g., "08:30")
+    private String arrivalTime;   // Format: "HH:MM" (e.g., "14:45")
     private String trainType;
-    private int maxPrice;
+    private int maxFirstClassPrice; // Maximum price for first class
+    private int maxSecondClassPrice; // Maximum price for second class
+    private DayOfWeek dayOfWeek; // For filtering by specific day of operation
 
-    // take strings from query params and convert to appropriate types
+    // Constructor for search parameters
     public SearchCriteria(
             String departureCity,
             String arrivalCity,
-            String departureDateTime,
-            String arrivalDateTime,
+            String departureTime,
+            String arrivalTime,
             String trainType,
-            String maxPrice) {
+            String maxFirstClassPrice,
+            String maxSecondClassPrice,
+            String dayOfWeek) {
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
-        this.departureDateTime = departureDateTime != null ? LocalDateTime.parse(departureDateTime) : null;
-        this.arrivalDateTime = arrivalDateTime != null ? LocalDateTime.parse(arrivalDateTime) : null;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
         this.trainType = trainType;
-        this.maxPrice = maxPrice != null ? Integer.parseInt(maxPrice) : 0;
+        this.maxFirstClassPrice = maxFirstClassPrice != null && !maxFirstClassPrice.trim().isEmpty() ? Integer.parseInt(maxFirstClassPrice) : 0;
+        this.maxSecondClassPrice = maxSecondClassPrice != null && !maxSecondClassPrice.trim().isEmpty() ? Integer.parseInt(maxSecondClassPrice) : 0;
+        this.dayOfWeek = dayOfWeek != null && !dayOfWeek.trim().isEmpty() ? DayOfWeek.valueOf(dayOfWeek.toUpperCase()) : null;
     }
 
     public SearchCriteria() {
 
+    }
+
+    // Getters
+    public String getDepartureCity() {
+        return departureCity;
+    }
+
+    public String getArrivalCity() {
+        return arrivalCity;
+    }
+
+    public String getDepartureTime() {
+        return departureTime;
+    }
+
+    public String getArrivalTime() {
+        return arrivalTime;
+    }
+
+    public String getTrainType() {
+        return trainType;
+    }
+
+    public int getMaxFirstClassPrice() {
+        return maxFirstClassPrice;
+    }
+
+    public int getMaxSecondClassPrice() {
+        return maxSecondClassPrice;
+    }
+
+    public DayOfWeek getDayOfWeek() {
+        return dayOfWeek;
     }
 }
