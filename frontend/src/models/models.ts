@@ -1,3 +1,5 @@
+import type { Dayjs } from "dayjs";
+
 const DayOfWeek = {
   MONDAY: "Monday",
   TUESDAY: "Tuesday",
@@ -34,3 +36,15 @@ export type ConnectionModel = {
   numberOfTransfers: number;
 };
 
+
+
+export type SearchFilters = {
+  departureCity?: string;
+  arrivalCity?: string;
+  departureTime?: Dayjs | null;
+  arrivalTime?: Dayjs | null;
+  trainType?: string;
+  maxFirstClassPrice?: number;
+  maxSecondClassPrice?: number;
+  dayOfWeek?: DayOfWeek | null;
+}

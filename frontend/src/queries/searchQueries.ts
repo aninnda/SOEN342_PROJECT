@@ -1,18 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import api from "./api";
 import type { SearchResponseModel } from "../models/responseModels";
-
-// Search filters interface
-interface SearchFilters {
-  departureCity?: string;
-  arrivalCity?: string;
-  departureTime?: string;
-  arrivalTime?: string;
-  trainType?: string;
-  maxFirstClassPrice?: number;
-  maxSecondClassPrice?: number;
-  dayOfWeek?: string;
-}
+import dayjs from "dayjs";
+import type { SearchFilters } from "../models/models";
 
 // TODO add pagination
 export const useGetAllConnections = () => {
@@ -31,24 +21,45 @@ export const useGetAllConnections = () => {
 };
 
 // New search query with filters
-export const useSearchConnections = (filters: SearchFilters, enabled: boolean = true) => {
+export const useSearchConnections = (
+  filters: SearchFilters,
+  enabled: boolean = true
+) => {
   const query = useQuery({
     queryKey: ["search", "connections", filters],
     queryFn: () => {
       // Build query parameters
       const params = new URLSearchParams();
-      
-      if (filters.departureCity) params.append('departureCity', filters.departureCity);
-      if (filters.arrivalCity) params.append('arrivalCity', filters.arrivalCity);
-      if (filters.departureTime) params.append('departureTime', filters.departureTime);
-      if (filters.arrivalTime) params.append('arrivalTime', filters.arrivalTime);
-      if (filters.trainType) params.append('trainType', filters.trainType);
-      if (filters.maxFirstClassPrice) params.append('maxFirstClassPrice', filters.maxFirstClassPrice.toString());
-      if (filters.maxSecondClassPrice) params.append('maxSecondClassPrice', filters.maxSecondClassPrice.toString());
-      if (filters.dayOfWeek) params.append('dayOfWeek', filters.dayOfWeek);
-      
+
+      if (filters.departureCity)
+        params.append("departureCity", filters.departureCity);
+      if (filters.arrivalCity)
+        params.append("arrivalCity", filters.arrivalCity);
+      if (filters.departureTime)
+        params.append(
+          "departureTime",
+          dayjs(filters.departureTime).format("HH:mm")
+        );
+      if (filters.arrivalTime)
+        params.append(
+          "arrivalTime",
+          dayjs(filters.arrivalTime).format("HH:mm")
+        );
+      if (filters.trainType) params.append("trainType", filters.trainType);
+      if (filters.maxFirstClassPrice)
+        params.append(
+          "maxFirstClassPrice",
+          filters.maxFirstClassPrice.toString()
+        );
+      if (filters.maxSecondClassPrice)
+        params.append(
+          "maxSecondClassPrice",
+          filters.maxSecondClassPrice.toString()
+        );
+      if (filters.dayOfWeek) params.append("dayOfWeek", filters.dayOfWeek);
+
       return api
-        .url(`/search${params.toString() ? `?${params.toString()}` : ''}`)
+        .url(`/search${params.toString() ? `?${params.toString()}` : ""}`)
         .get()
         .json<SearchResponseModel>()
         .then((res) => res);
@@ -76,4 +87,18 @@ export const useGetTrainTypes = () => {
   return query;
 };
 
-export type { SearchFilters };
+// Hook to fetch all cities for autocomplete
+export const useGetCities = () => {
+  const query = useQuery({
+    queryKey: ["get", "cities"],
+    queryFn: () =>
+      api
+        .url("/cities")
+        .get()
+        .json<string[]>()
+        .then((res) => res),
+    retry: 1,
+  });
+
+  return query;
+};

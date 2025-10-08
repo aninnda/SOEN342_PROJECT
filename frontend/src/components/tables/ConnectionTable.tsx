@@ -1,14 +1,23 @@
 import { useMemo, useState } from "react";
-import type { ConnectionModel, RouteModel } from "../../models/models";
+import type { ConnectionModel, RouteModel, SearchFilters } from "../../models/models";
 import { getDisplayNameForDaysOfOperation } from "../../utils/dateUtils";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useSearchConnections, type SearchFilters } from "../../queries/searchQueries";
+import {
+  useSearchConnections,
+} from "../../queries/searchQueries";
 import IndirectConnectionTable from "./IndirectConnectionTable";
-import { Box, FormControl, InputLabel, Select, MenuItem, Typography } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
 
 interface ConnectionTableProps {
@@ -18,10 +27,12 @@ interface ConnectionTableProps {
 /**
  * Built using https://www.material-react-table.com/docs/getting-started/usage as reference.
  */
-export default function ConnectionTable({ searchFilters = {} }: ConnectionTableProps) {
+export default function ConnectionTable({
+  searchFilters = {},
+}: ConnectionTableProps) {
   const searchConnectionsQuery = useSearchConnections(searchFilters, true);
-  const [sortBy, setSortBy] = useState<string>('');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
   const connections = useMemo<ConnectionModel[]>(() => {
     if (searchConnectionsQuery.isSuccess && searchConnectionsQuery.data) {
@@ -33,38 +44,38 @@ export default function ConnectionTable({ searchFilters = {} }: ConnectionTableP
 
   const routes = useMemo<RouteModel[]>(() => {
     let routeList = connections.map((conn) => conn.routes[0]);
-    
+
     // Apply sorting if a sort column is selected, after the user's results are fetched
     if (sortBy) {
       routeList = [...routeList].sort((a, b) => {
         let aValue: any;
         let bValue: any;
-        
+
         switch (sortBy) {
-          case 'tripDuration':
+          case "tripDuration":
             aValue = a.tripDuration;
             bValue = b.tripDuration;
             break;
-          case 'firstClassTicketRate':
+          case "firstClassTicketRate":
             aValue = a.firstClassTicketRate;
             bValue = b.firstClassTicketRate;
             break;
-          case 'secondClassTicketRate':
+          case "secondClassTicketRate":
             aValue = a.secondClassTicketRate;
             bValue = b.secondClassTicketRate;
             break;
           default:
             return 0;
         }
-        
-        if (sortOrder === 'asc') {
+
+        if (sortOrder === "asc") {
           return aValue - bValue;
         } else {
           return bValue - aValue;
         }
       });
     }
-    
+
     return routeList;
   }, [connections, sortBy, sortOrder]);
 
@@ -121,7 +132,7 @@ export default function ConnectionTable({ searchFilters = {} }: ConnectionTableP
           const duration = cell.getValue() as number;
           const hours = Math.floor(duration);
           const minutes = Math.round((duration - hours) * 60);
-          
+
           if (hours === 0) {
             return `${minutes}m`;
           } else if (minutes === 0) {
@@ -162,26 +173,34 @@ export default function ConnectionTable({ searchFilters = {} }: ConnectionTableP
   };
 
   const handleSortOrderChange = (event: SelectChangeEvent) => {
-    setSortOrder(event.target.value as 'asc' | 'desc');
+    setSortOrder(event.target.value as "asc" | "desc");
   };
 
   return (
     <>
       {/* Sorting Controls */}
-      <Box sx={{ mb: 2, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-        <Typography variant="h6" component="span">Sort Results:</Typography>
-        
+      <Box
+        sx={{
+          mb: 2,
+          display: "flex",
+          gap: 2,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Typography variant="h6" component="span">
+          Sort Results:
+        </Typography>
+
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Sort By</InputLabel>
-          <Select
-            value={sortBy}
-            label="Sort By"
-            onChange={handleSortByChange}
-          >
+          <Select value={sortBy} label="Sort By" onChange={handleSortByChange}>
             <MenuItem value="">None</MenuItem>
             <MenuItem value="tripDuration">Trip Duration</MenuItem>
             <MenuItem value="firstClassTicketRate">First Class Price</MenuItem>
-            <MenuItem value="secondClassTicketRate">Second Class Price</MenuItem>
+            <MenuItem value="secondClassTicketRate">
+              Second Class Price
+            </MenuItem>
           </Select>
         </FormControl>
 
@@ -194,19 +213,27 @@ export default function ConnectionTable({ searchFilters = {} }: ConnectionTableP
             disabled={!sortBy}
           >
             <MenuItem value="asc">
-              {sortBy === 'tripDuration' ? 'Shortest First' :
-               sortBy.includes('Price') ? 'Lowest First' : 'Ascending'}
+              {sortBy === "tripDuration"
+                ? "Shortest First"
+                : sortBy.includes("Price")
+                ? "Lowest First"
+                : "Ascending"}
             </MenuItem>
             <MenuItem value="desc">
-              {sortBy === 'tripDuration' ? 'Longest First' :
-               sortBy.includes('Price') ? 'Highest First' : 'Descending'}
+              {sortBy === "tripDuration"
+                ? "Longest First"
+                : sortBy.includes("Price")
+                ? "Highest First"
+                : "Descending"}
             </MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      {!displayIndirectTable && <MaterialReactTable table={table} />}
-      {displayIndirectTable && <IndirectConnectionTable data={connections} />}
+      <Box sx={{ maxWidth: "90vw", overflowX: "auto" }}>
+        {!displayIndirectTable && <MaterialReactTable table={table} />}
+        {displayIndirectTable && <IndirectConnectionTable data={connections} />}
+      </Box>
     </>
   );
 }

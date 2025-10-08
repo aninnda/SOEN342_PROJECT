@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import ConnectionTable from "../components/tables/ConnectionTable";
-import SearchInterface from "../components/SearchInterface";
-import type { SearchFilters } from "../queries/searchQueries";
+import SearchInterface from "../components/searchFilters/SearchInterface";
+import type { SearchFilters } from "../models/models";
 
 /**
  * Main view that combines search interface with results table
