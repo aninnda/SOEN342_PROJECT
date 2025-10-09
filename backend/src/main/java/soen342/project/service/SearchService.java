@@ -2,7 +2,6 @@ package soen342.project.service;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 

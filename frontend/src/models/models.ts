@@ -28,15 +28,24 @@ export type RouteModel = {
 
 export type ConnectionModel = {
   routes: RouteModel[];
-
   totalMovingDuration: number;
   connectionChangeDuration: number;
   totalTripDuration: number;
   totalFirstClassTicketRate: number;
   totalSecondClassTicketRate: number;
   numberOfTransfers: number;
+  layovers?: LayoverModel[];
 };
 
+
+export type LayoverModel = {
+  startRoute: RouteModel;
+  endRoute: RouteModel;
+  firstRouteStartDay: DayOfWeek;
+  firstRouteEndDay: DayOfWeek;
+  secondRouteStartDay: DayOfWeek;
+  layoverDuration: number; // in hours
+}
 
 
 export type SearchFilters = {

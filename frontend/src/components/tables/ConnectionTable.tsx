@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
-import type { ConnectionModel, RouteModel, SearchFilters } from "../../models/models";
+import type {
+  ConnectionModel,
+  RouteModel,
+  SearchFilters,
+} from "../../models/models";
 import { getDisplayNameForDaysOfOperation } from "../../utils/dateUtils";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import {
-  useSearchConnections,
-} from "../../queries/searchQueries";
+import { useSearchConnections } from "../../queries/searchQueries";
 import IndirectConnectionTable from "./IndirectConnectionTable";
 import {
   Box,
@@ -150,6 +152,8 @@ export default function ConnectionTable({
   const table = useMaterialReactTable({
     columns,
     data: routes,
+
+    enableStickyHeader: true,
 
     // disable filtering
     enableColumnFilterModes: false,

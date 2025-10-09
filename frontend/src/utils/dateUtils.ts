@@ -59,3 +59,24 @@ export function getDisplayNameForDaysOfOperation(days: DayOfWeek[]): string {
 
   return ranges.join(", ");
 }
+
+export function formatDuration(duration: number): string {
+  if (duration >= 24) {
+    const days = Math.floor(duration / 24);
+    const hours = Math.floor(duration % 24);
+    const minutes = Math.round((duration - Math.floor(duration)) * 60);
+    let result = `${days}d`;
+    if (hours > 0) result += ` ${hours}h`;
+    if (minutes > 0) result += ` ${minutes}m`;
+    return result.trim();
+  }
+  const hours = Math.floor(duration);
+  const minutes = Math.round((duration - hours) * 60);
+  if (hours === 0) {
+    return `${minutes}m`;
+  } else if (minutes === 0) {
+    return `${hours}h`;
+  } else {
+    return `${hours}h ${minutes}m`;
+  }
+}

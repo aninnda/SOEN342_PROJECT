@@ -2,16 +2,30 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
+  type MRT_Row,
 } from "material-react-table";
-import type { ConnectionModel, RouteModel } from "../../models/models";
-import { getDisplayNameForDaysOfOperation } from "../../utils/dateUtils";
+import type {
+  ConnectionModel,
+  LayoverModel,
+  RouteModel,
+} from "../../models/models";
+import {
+  formatDuration,
+  getDisplayNameForDaysOfOperation,
+} from "../../utils/dateUtils";
 import { useMemo } from "react";
+import { Box, Tooltip } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
 
 type IndirectConnectionTableProps = {
   data: ConnectionModel[];
 };
 
-type ExtendedRouteModel = RouteModel & { connectionId: string };
+type ExtendedRouteModel = RouteModel & {
+  connectionId: string;
+  connectionChangeDuration: number;
+  layovers?: LayoverModel[];
+};
 
 //TODO map indirect connections
 export default function IndirectConnectionTable(
@@ -25,7 +39,12 @@ export default function IndirectConnectionTable(
         .map((route) => route.routeId)
         .join("-");
       connection.routes.forEach((route) => {
-        routes.push({ ...route, connectionId });
+        routes.push({
+          ...route,
+          connectionId,
+          connectionChangeDuration: connection.connectionChangeDuration,
+          layovers: connection.layovers,
+        });
       });
     });
 
@@ -39,22 +58,24 @@ export default function IndirectConnectionTable(
         accessorKey: "connectionId",
         enableSorting: false,
         enableGrouping: true,
-        Cell: ({ row, table }) => {
-          // Get all rows in the same group (same connectionId)
+        GroupedCell: ({ row }) => {
           const connectionId = row.original.connectionId;
-          const groupedRows = table
-            .getRowModel()
-            .rows.filter((r) => r.original.connectionId === connectionId);
-          const cities = new Set<string>(
-            groupedRows.map((r) => r.original.departureCity)
-          );
 
-          if (groupedRows.length > 1) {
-            cities.add(
-              groupedRows[groupedRows.length - 1].original.arrivalCity
-            );
+          const routes = props.data.find(
+            (conn) =>
+              connectionId ===
+              conn.routes.map((route) => route.routeId).join("-")
+          )?.routes;
+
+          const cities = new Set<string>(routes?.map((r) => r.departureCity));
+
+          if (!!routes?.length) {
+            if (routes?.length > 1) {
+              cities.add(routes[routes?.length - 1].arrivalCity);
+            }
           }
-          return Array.from(cities).join(" → ");
+
+          return Array.from(cities).join(" - ");
         },
       },
       {
@@ -108,21 +129,61 @@ export default function IndirectConnectionTable(
         enableGrouping: false,
       },
       {
-        header: "Trip Duration",
+        header: "Trip (moving) Duration",
         accessorKey: "tripDuration",
+        aggregationFn: "sum",
+        AggregatedCell: ({ cell }) => formatDuration(cell.getValue() as number),
         enableSorting: false,
         enableGrouping: false,
         Cell: ({ cell }: any) => {
           const duration = cell.getValue() as number;
-          const hours = Math.floor(duration);
-          const minutes = Math.round((duration - hours) * 60);
-          if (hours === 0) {
-            return `${minutes}m`;
-          } else if (minutes === 0) {
-            return `${hours}h`;
-          } else {
-            return `${hours}h ${minutes}m`;
-          }
+          return formatDuration(duration);
+        },
+      },
+      {
+        header: "Connection Change Duration",
+        accessorKey: "connectionChangeDuration",
+        aggregationFn: "max",
+        AggregatedCell: ({ cell }) => formatDuration(cell.getValue() as number),
+        enableSorting: false,
+        enableGrouping: false,
+        Header: () => (
+          <Box display="flex" alignItems="center">
+            Connection Change Duration
+            <Tooltip
+              title=" Connection change duration is calculated as the shortest time spent waiting at each layover, with ideal departure days.
+              Day and time filters do not affect these values."
+            >
+              <InfoIcon color="warning" />
+            </Tooltip>
+          </Box>
+        ),
+        Cell: ({ row }: { row: MRT_Row<ExtendedRouteModel> }) => {
+          const tooltipText = row.original.layovers
+            ?.map((layover, index) => {
+              return `Layover ${index + 1}: Depart ${
+                layover.startRoute.departureCity
+              } (${layover.startRoute.departureTime}, ${
+                layover.firstRouteStartDay
+              }), Arrive ${layover.startRoute.arrivalCity} (${
+                layover.startRoute.arrivalTime
+              }, ${layover.firstRouteEndDay}), then wait ${formatDuration(
+                layover.layoverDuration
+              )} for the next train to ${layover.endRoute.arrivalCity} (${
+                layover.endRoute.departureTime
+              }, ${layover.secondRouteStartDay})`;
+            })
+            .join("\n");
+
+          return (
+            <Box gap={1} display="flex">
+              {formatDuration(row.original.connectionChangeDuration as number)}
+
+              <Tooltip title={tooltipText}>
+                <InfoIcon />
+              </Tooltip>
+            </Box>
+          );
         },
       },
     ],
@@ -132,6 +193,7 @@ export default function IndirectConnectionTable(
   const table = useMaterialReactTable({
     columns,
     data: extendedRoutes,
+    enableStickyHeader: true,
 
     // disable filtering
     enableColumnFilterModes: false,
@@ -148,13 +210,22 @@ export default function IndirectConnectionTable(
     // grouping for connections
     enableGrouping: true,
     groupedColumnMode: false,
-    initialState: { grouping: ["connectionId"] },
+    initialState: { grouping: ["connectionId"], expanded: true },
+    paginateExpandedRows: false,
 
     // styling
     displayColumnDefOptions: {
-      "mrt-row-expand": {},
+      "mrt-row-expand": {
+        muiTableBodyCellProps: ({ row }) => ({
+          sx: (theme) => ({
+            backgroundColor: row.getIsGrouped()
+              ? theme.palette.primary.dark
+              : "",
+          }),
+        }),
+        size: 10,
+      },
     },
-
   });
 
   return <MaterialReactTable table={table} />;
