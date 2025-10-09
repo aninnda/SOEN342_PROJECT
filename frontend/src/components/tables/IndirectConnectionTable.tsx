@@ -14,7 +14,7 @@ import {
   getDisplayNameForDaysOfOperation,
 } from "../../utils/dateUtils";
 import { useMemo } from "react";
-import { Box, Tooltip } from "@mui/material";
+import { Alert, Box, Tooltip, Typography } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 
 type IndirectConnectionTableProps = {
@@ -119,13 +119,17 @@ export default function IndirectConnectionTable(
       {
         header: "First Class Ticket Rate",
         accessorKey: "firstClassTicketRate",
-        enableSorting: false,
+        aggregationFn: "sum",
+        AggregatedCell: ({ cell }) => cell.getValue<number>(),
+        enableSorting: true,
         enableGrouping: false,
       },
       {
         header: "Second Class Ticket Rate",
         accessorKey: "secondClassTicketRate",
-        enableSorting: false,
+        aggregationFn: "sum",
+        AggregatedCell: ({ cell }) => cell.getValue<number>(),
+        enableSorting: true,
         enableGrouping: false,
       },
       {
@@ -133,7 +137,6 @@ export default function IndirectConnectionTable(
         accessorKey: "tripDuration",
         aggregationFn: "sum",
         AggregatedCell: ({ cell }) => formatDuration(cell.getValue() as number),
-        enableSorting: false,
         enableGrouping: false,
         Cell: ({ cell }: any) => {
           const duration = cell.getValue() as number;
@@ -145,7 +148,7 @@ export default function IndirectConnectionTable(
         accessorKey: "connectionChangeDuration",
         aggregationFn: "max",
         AggregatedCell: ({ cell }) => formatDuration(cell.getValue() as number),
-        enableSorting: false,
+        enableSorting: true,
         enableGrouping: false,
         Header: () => (
           <Box display="flex" alignItems="center">
@@ -195,6 +198,9 @@ export default function IndirectConnectionTable(
     data: extendedRoutes,
     enableStickyHeader: true,
 
+    muiToolbarAlertBannerProps: {
+      hidden: true,
+    },
     // disable filtering
     enableColumnFilterModes: false,
     enableFilters: false,
@@ -228,5 +234,15 @@ export default function IndirectConnectionTable(
     },
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <Box>
+        <Alert severity="info" variant="outlined" sx={{my: 2}}>
+          No direct connections were found. Displaying indirect connections
+          instead.
+        </Alert>
+      </Box>
+      <MaterialReactTable table={table} />;
+    </>
+  );
 }

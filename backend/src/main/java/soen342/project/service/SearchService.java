@@ -29,11 +29,10 @@ public class SearchService {
         boolean containsIndirectConnections = false;
 
         if (connections.isEmpty()) {
-            containsIndirectConnections = true;
-        }
-
-        if (containsIndirectConnections) {
             connections.addAll(searchIndirectConnections(criteria));
+            if (!connections.isEmpty()) {
+                containsIndirectConnections = true;
+            }
         }
 
         return new SearchResponseModel(connections, containsIndirectConnections);
@@ -48,7 +47,7 @@ public class SearchService {
 
         indirectConnections.addAll(oneStopConnections);
         indirectConnections.addAll(twoStopConnections);
-        
+
         return indirectConnections;
     }
 
