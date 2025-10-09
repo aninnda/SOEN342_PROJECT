@@ -2,6 +2,7 @@ package soen342.project.service;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,17 +34,32 @@ public class SearchService {
         }
 
         if (containsIndirectConnections) {
-            connections.addAll(searchIndirectConnections(criteria, allRoutes));
+            connections.addAll(searchIndirectConnections(criteria));
         }
 
         return new SearchResponseModel(connections, containsIndirectConnections);
     }
 
-    private List<Connection> searchIndirectConnections(SearchCriteria criteria, List<Route> allRoutes) {
+    private List<Connection> searchIndirectConnections(SearchCriteria criteria) {
 
         List<Connection> indirectConnections = new ArrayList<>();
 
-        List<Route> startRoute = filterRoutes(allRoutes, new SearchCriteria(
+        List<Connection> oneStopConnections = searchOneStops(criteria);
+        List<Connection> twoStopConnections = searchTwoStops(criteria);
+
+        indirectConnections.addAll(oneStopConnections);
+        indirectConnections.addAll(twoStopConnections);
+        
+        return indirectConnections;
+    }
+
+    private List<Connection> searchOneStops(SearchCriteria criteria) {
+
+        List<Connection> oneStopConnections = new ArrayList<>();
+        List<Route> candidateStartRoutes = Database.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = Database.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
+
+        List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
                 criteria.getDepartureCity(),
                 null,
                 criteria.getDepartureTime(),
@@ -53,29 +69,81 @@ public class SearchService {
                 criteria.getMaxSecondClassPrice(),
                 criteria.getDayOfWeek()));
 
-        List<Route> endRoute = filterRoutes(allRoutes, new SearchCriteria(
+        List<Route> filteredCandidateEndRoutes = filterRoutes(candidateEndRoutes, new SearchCriteria(
                 null,
                 criteria.getArrivalCity(),
                 null,
-                criteria.getArrivalTime(),
+                criteria.getArrivalTime(), // maybe we ignore this for indirects
                 criteria.getTrainType(),
                 criteria.getMaxFirstClassPrice(),
                 criteria.getMaxSecondClassPrice(),
-                criteria.getDayOfWeek()));
+                null));
 
-        for (Route start : startRoute) {
-            for (Route end : endRoute) {
+        for (Route start : filteredCandidateStartRoutes) {
+            for (Route end : filteredCandidateEndRoutes) {
                 // Ensure the arrival city of the start route matches the departure city of the
                 // end route
                 if (start.getArrivalCity().equalsIgnoreCase(end.getDepartureCity())) {
                     // Ensure the arrival time of the start route is before the departure time of
                     // the end route
-                    indirectConnections.add(new Connection(List.of(start, end)));
+                    oneStopConnections.add(new Connection(List.of(start, end)));
                 }
             }
         }
 
-        return indirectConnections;
+        return oneStopConnections;
+    }
+
+    private List<Connection> searchTwoStops(SearchCriteria criteria) {
+
+        List<Connection> twoStopConnections = new ArrayList<>();
+        List<Route> candidateStartRoutes = Database.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = Database.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
+
+        List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
+                criteria.getDepartureCity(),
+                null,
+                criteria.getDepartureTime(),
+                null,
+                criteria.getTrainType(),
+                criteria.getMaxFirstClassPrice(),
+                criteria.getMaxSecondClassPrice(),
+                criteria.getDayOfWeek()));
+
+        List<Route> filteredCandidateEndRoutes = filterRoutes(candidateEndRoutes, new SearchCriteria(
+                null,
+                criteria.getArrivalCity(),
+                null,
+                criteria.getArrivalTime(), // maybe we ignore arrival time for indirects
+                criteria.getTrainType(),
+                criteria.getMaxFirstClassPrice(),
+                criteria.getMaxSecondClassPrice(),
+                null));
+
+        for (Route firstRoute : filteredCandidateStartRoutes) {
+            for (Route lastRoute : filteredCandidateEndRoutes) {
+                List<Route> middleRoutes = Database.getInstance().getRoutesByDepartureCity(firstRoute.getArrivalCity());
+                List<Route> filteredMiddleRoutes = filterRoutes(middleRoutes, new SearchCriteria(
+                        null,
+                        null,
+                        null,
+                        null,
+                        criteria.getTrainType(),
+                        criteria.getMaxFirstClassPrice(),
+                        criteria.getMaxSecondClassPrice(),
+                        null));
+                for (Route middleRoute : filteredMiddleRoutes) {
+                    if (firstRoute.getArrivalCity().equalsIgnoreCase(middleRoute.getDepartureCity()) &&
+                            middleRoute.getArrivalCity().equalsIgnoreCase(lastRoute.getDepartureCity())) {
+                        twoStopConnections.add(new Connection(List.of(firstRoute, middleRoute, lastRoute)));
+                    }
+                }
+
+            }
+        }
+
+        return twoStopConnections;
+
     }
 
     // filtering the routes based on the criteria provided by the user

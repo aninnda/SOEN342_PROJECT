@@ -12,6 +12,7 @@ import soen342.project.model.Route;
 import soen342.project.util.DateTimeUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Database {
 
@@ -19,23 +20,37 @@ public class Database {
     private static final String ROUTES_CSV_FILE = "src/main/resources/static/eu_rail_network.csv";
 
     private List<Route> routes;
+    private HashMap<String, List<Route>> routesByDepartureCity;
+    private HashMap<String, List<Route>> routesByArrivalCity;
 
     private static Database instance;
 
     private Database() {
         // private constructor to prevent instantiation from outside as it's a singleton
+
     }
 
     public static synchronized Database getInstance() {
         if (instance == null) {
             instance = new Database();
             instance.readRoutesFromCSV(ROUTES_CSV_FILE);
+            instance.loadRoutesByDepartureCity();
+            instance.loadRoutesByArrivalCity();
+
         }
         return instance;
     }
 
     public List<Route> getRoutes() {
         return routes;
+    }
+
+    public List<Route> getRoutesByDepartureCity(String departureCity) {
+        return routesByDepartureCity.getOrDefault(departureCity.toLowerCase(), new ArrayList<>());
+    }
+
+    public List<Route> getRoutesByArrivalCity(String arrivalCity) {
+        return routesByArrivalCity.getOrDefault(arrivalCity.toLowerCase(), new ArrayList<>());
     }
 
     // written with help from Copilot (as a database will likely be used later on)
@@ -52,7 +67,7 @@ public class Database {
                 // Fallback to file system path
                 br = new BufferedReader(new FileReader(filePath));
             }
-            
+
             if (br != null) {
                 String line;
                 boolean isFirstLine = true;
@@ -119,6 +134,24 @@ public class Database {
         values.add(currentValue.toString());
 
         return values.toArray(new String[0]);
+    }
+
+    private void loadRoutesByDepartureCity() {
+        routesByDepartureCity = new HashMap<>();
+        for (Route route : routes) {
+            routesByDepartureCity
+                    .computeIfAbsent(route.getDepartureCity().toLowerCase(), k -> new ArrayList<>())
+                    .add(route);
+        }
+    }
+
+    private void loadRoutesByArrivalCity() {
+        routesByArrivalCity = new HashMap<>();
+        for (Route route : routes) {
+            routesByArrivalCity
+                    .computeIfAbsent(route.getArrivalCity().toLowerCase(), k -> new ArrayList<>())
+                    .add(route);
+        }
     }
 
 }
