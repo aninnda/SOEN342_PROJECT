@@ -18,7 +18,6 @@ import type { Dayjs } from "dayjs";
 import { useMemo, useReducer } from "react";
 import type { SearchFilters } from "../../models/models";
 import { useGetCities, useGetTrainTypes } from "../../queries/searchQueries";
-import { ClearButton } from "./ClearButton";
 import { WrappedNumberInput } from "./WrappedNumberInput";
 import { WrappedAutocomplete } from "./WrappedAutocomplete";
 import WrappedTimeField from "./WrappedTimeField";
@@ -115,7 +114,6 @@ function SearchInterface(props: SearchInterfaceProps) {
     props.onClear();
   };
 
-  console.log(JSON.stringify(filters), JSON.stringify(initialFilters));
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
       <Typography variant="h5" gutterBottom>
@@ -187,7 +185,6 @@ function SearchInterface(props: SearchInterfaceProps) {
                 label="Arrival Time"
                 error={!!filters.arrivalTime && !filters.arrivalTime.isValid()}
                 parentOnChange={(newTime: Dayjs | null) => {
-                  console.log(newTime);
                   dispatch({ type: "arrivalTime", payload: newTime });
                 }}
               />

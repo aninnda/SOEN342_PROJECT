@@ -32,6 +32,24 @@ export function WrappedAutocomplete(props: Props) {
       fullWidth
       onBlur={handleBlur}
       onInputChange={handleChange}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          // this keydown handler makes it so that when you press enter, it runs handleBlur which updates the parent's state
+          // but also, it selects the currently highlighted option in the autocomplete list if there is one.
+          const autocomplete = e.target as HTMLElement;
+          const highlighted = document.querySelector(
+            ".MuiAutocomplete-option.Mui-focused"
+          );
+          if (highlighted) {
+            highlighted.dispatchEvent(
+              new MouseEvent("click", { bubbles: true })
+            );
+          }
+          setTimeout(() => {
+            autocomplete.blur();
+          });
+        }
+      }}
     />
   );
 }

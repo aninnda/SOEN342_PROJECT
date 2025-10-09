@@ -14,6 +14,7 @@ export type DayOfWeek = typeof DayOfWeek[keyof typeof DayOfWeek];
 
 
 export type RouteModel = {
+  routeId: string;
   departureCity: string;
   arrivalCity: string;
   departureTime: string; // format is hh:mm
