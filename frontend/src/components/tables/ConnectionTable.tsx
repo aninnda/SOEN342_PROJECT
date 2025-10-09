@@ -109,7 +109,6 @@ export default function ConnectionTable({
     []
   );
 
-  // TODO ask prof about disabling sorting and filtering in ui component
   const table = useMaterialReactTable({
     columns,
     data: routes,

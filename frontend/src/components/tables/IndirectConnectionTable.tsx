@@ -27,7 +27,6 @@ type ExtendedRouteModel = RouteModel & {
   layovers?: LayoverModel[];
 };
 
-//TODO map indirect connections
 export default function IndirectConnectionTable(
   props: IndirectConnectionTableProps
 ) {
