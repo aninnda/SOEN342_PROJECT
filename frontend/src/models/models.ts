@@ -1,3 +1,5 @@
+import type { Dayjs } from "dayjs";
+
 const DayOfWeek = {
   MONDAY: "Monday",
   TUESDAY: "Tuesday",
@@ -12,6 +14,7 @@ export type DayOfWeek = typeof DayOfWeek[keyof typeof DayOfWeek];
 
 
 export type RouteModel = {
+  routeId: string;
   departureCity: string;
   arrivalCity: string;
   departureTime: string; // format is hh:mm
@@ -25,12 +28,33 @@ export type RouteModel = {
 
 export type ConnectionModel = {
   routes: RouteModel[];
-
   totalMovingDuration: number;
   connectionChangeDuration: number;
   totalTripDuration: number;
   totalFirstClassTicketRate: number;
   totalSecondClassTicketRate: number;
   numberOfTransfers: number;
+  layovers?: LayoverModel[];
 };
 
+
+export type LayoverModel = {
+  startRoute: RouteModel;
+  endRoute: RouteModel;
+  firstRouteStartDay: DayOfWeek;
+  firstRouteEndDay: DayOfWeek;
+  secondRouteStartDay: DayOfWeek;
+  layoverDuration: number; // in hours
+}
+
+
+export type SearchFilters = {
+  departureCity?: string;
+  arrivalCity?: string;
+  departureTime?: Dayjs | null;
+  arrivalTime?: Dayjs | null;
+  trainType?: string;
+  maxFirstClassPrice?: number;
+  maxSecondClassPrice?: number;
+  dayOfWeek?: DayOfWeek | null;
+}

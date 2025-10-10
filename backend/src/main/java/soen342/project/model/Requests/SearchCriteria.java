@@ -7,7 +7,7 @@ public class SearchCriteria {
     private String departureCity;
     private String arrivalCity;
     private String departureTime; // Format: "HH:MM" (e.g., "08:30")
-    private String arrivalTime;   // Format: "HH:MM" (e.g., "14:45")
+    private String arrivalTime; // Format: "HH:MM" (e.g., "14:45")
     private String trainType;
     private int maxFirstClassPrice; // Maximum price for first class
     private int maxSecondClassPrice; // Maximum price for second class
@@ -28,13 +28,30 @@ public class SearchCriteria {
         this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.trainType = trainType;
-        this.maxFirstClassPrice = maxFirstClassPrice != null && !maxFirstClassPrice.trim().isEmpty() ? Integer.parseInt(maxFirstClassPrice) : 0;
-        this.maxSecondClassPrice = maxSecondClassPrice != null && !maxSecondClassPrice.trim().isEmpty() ? Integer.parseInt(maxSecondClassPrice) : 0;
-        this.dayOfWeek = dayOfWeek != null && !dayOfWeek.trim().isEmpty() ? DayOfWeek.valueOf(dayOfWeek.toUpperCase()) : null;
+        this.maxFirstClassPrice = maxFirstClassPrice != null && !maxFirstClassPrice.trim().isEmpty()
+                ? Integer.parseInt(maxFirstClassPrice)
+                : 0;
+        this.maxSecondClassPrice = maxSecondClassPrice != null && !maxSecondClassPrice.trim().isEmpty()
+                ? Integer.parseInt(maxSecondClassPrice)
+                : 0;
+        this.dayOfWeek = dayOfWeek != null && !dayOfWeek.trim().isEmpty() ? DayOfWeek.valueOf(dayOfWeek.toUpperCase())
+                : null;
     }
 
     public SearchCriteria() {
 
+    }
+
+    public SearchCriteria(String departureCity, String arrivalCity, String departureTime, String arrivalTime,
+            String trainType, int maxFirstClassPrice, int maxSecondClassPrice, DayOfWeek dayOfWeek) {
+        this.arrivalCity = arrivalCity;
+        this.departureCity = departureCity;
+        this.departureTime = departureTime;
+        this.arrivalTime = arrivalTime;
+        this.trainType = trainType;
+        this.maxFirstClassPrice = maxFirstClassPrice;        
+        this.maxSecondClassPrice = maxSecondClassPrice;
+        this.dayOfWeek = dayOfWeek;
     }
 
     // Getters

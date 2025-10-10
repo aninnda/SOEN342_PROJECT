@@ -1,6 +1,7 @@
 package soen342.project.util;
 
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -123,6 +124,50 @@ public class DateTimeUtils {
             default:
                 return null; // Handle unexpected values if necessary
         }
+    }
+
+    /**
+     * Calculates the difference in hours between two date-times.
+     * The difference works chronologically, from start datetime to end datetime.
+     * 
+     * @param startDay
+     * @param startTime
+     * @param endDay
+     * @param endTime
+     * @param doesFirstRouteEndOnNextDay
+     * @return
+     */
+    public static double calculateDateTimeDifferenceInHours(DayOfWeek startDay, String startTime, DayOfWeek endDay,
+            String endTime) {
+        int dayDifference = endDay.ordinal() - (startDay.ordinal() + (startTime.contains("(+1d)") ? 1 : 0));
+        if (dayDifference < 0) {
+            dayDifference += 7; // wrap around the week
+        }
+
+        String startTimeCleaned = startTime.replace(" (+1d)", "").trim();
+        String endTimeCleaned = endTime.replace(" (+1d)", "").trim(); // not necessary because departure times don't
+                                                                      // have +1, but for consistency
+
+        boolean isStartTimeAfterEndTime = LocalTime.parse(startTimeCleaned).isAfter(LocalTime.parse(endTimeCleaned));
+
+        String[] startParts = startTime.replace("(+1d)", "").split(":");
+        String[] endParts = endTime.split(":");
+
+        int startHour = Integer.parseInt(startParts[0]);
+        int startMinute = Integer.parseInt(startParts[1]);
+        int endHour = Integer.parseInt(endParts[0]);
+        int endMinute = Integer.parseInt(endParts[1]);
+
+        int totalStartMinutes = startHour * 60 + startMinute;
+
+        // If the start time is after the end time on the same day, then the difference
+        // wraps to the next week.
+        int adjustedDayDifference = dayDifference == 0 && isStartTimeAfterEndTime ? 7 : dayDifference;
+
+        int totalEndMinutes = endHour * 60 + endMinute + (adjustedDayDifference * 24 * 60);
+
+        int differenceInMinutes = totalEndMinutes - totalStartMinutes;
+        return differenceInMinutes / 60.0;
     }
 
 }
