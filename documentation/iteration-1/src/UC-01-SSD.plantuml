@@ -1,0 +1,16 @@
+@startuml
+
+User -> System: search(searchCriteria)
+
+alt#Gold #LightBlue Direct connections found
+    System --> User: Direct connections
+else #Green No direct connectiosn found,\nIndirect connections found
+    System --> User: Indirect connections
+else #Pink No connections found
+    System --> User: "No connections found"
+end
+
+User -> System: sort(sortType, sortDirection)
+System --> User: sorted results based on type
+
+@enduml
