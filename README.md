@@ -7,6 +7,8 @@ Team members
 1. Aninnda Kumar Datta 40298954 (Team Leader)
 2. Duc Vinh Lam 40282959
 
+## Documentation
+Documentation, such as Use Case Models, Sequence Diagrams, and Domain Models can be found under [documentation](https://github.com/aninnda/SOEN342_PROJECT/blob/main/documentation/)
 
 ## Running instructions
 
