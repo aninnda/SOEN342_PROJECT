@@ -1,0 +1,37 @@
+@startuml
+participant SearchService
+participant Database
+collections Routes
+participant Connection
+collections Connections
+
+-> SearchService: search(searchCriteria)
+SearchService -> Database: getRoutes()
+Database -> Routes: getRoutes()
+Routes --> Database: routes
+Database --> SearchService: allRoutes:=routes
+SearchService -> SearchService: getDirectConnetions(routes, searchCriteria)
+alt#White #LightBlue Direct connections found
+    loop
+    SearchService -> Connection **: dc:=create(directConnectionRoute: List<Route>)
+    SearchService -> Connections: add(dc)
+    end
+    Connections --> SearchService: direct connections
+    <-- SearchService: direct connections
+    
+else #Green No direct connections found,\nIndirect connections found
+    
+    SearchService -> SearchService: getIndirectConnetions(routes, searchCriteria)
+    loop
+    SearchService -> Connection **: ic:=create(indirectConnectionRoutes: List<Route>)
+    SearchService -> Connections: add(ic)
+    end
+    Connections --> SearchService: indirect connections
+    <-- SearchService: indirect connections
+    
+else #Pink No connections found
+    <-- SearchService: "No connections found"
+    end
+
+
+@enduml
