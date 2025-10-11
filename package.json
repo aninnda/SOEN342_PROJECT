@@ -1,0 +1,16 @@
+{
+  "name": "soen342_project",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && bun run dev",
+    "build": "cd frontend && bun run build",
+    "postinstall": "cd frontend && bun install"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
