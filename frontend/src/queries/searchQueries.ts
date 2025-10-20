@@ -13,7 +13,7 @@ export const useGetAllConnections = () => {
         .url("/search")
         .get()
         .json<SearchResponseModel>()
-        .then((res) => res),
+      .then((res: SearchResponseModel) => res),
     retry: 1,
   });
 
@@ -62,7 +62,7 @@ export const useSearchConnections = (
         .url(`/search${params.toString() ? `?${params.toString()}` : ""}`)
         .get()
         .json<SearchResponseModel>()
-        .then((res) => res);
+      .then((res: SearchResponseModel) => res);
     },
     retry: 1,
     enabled: enabled,
@@ -80,7 +80,7 @@ export const useGetTrainTypes = () => {
         .url("/suggestions/train-types")
         .get()
         .json<string[]>()
-        .then((res) => res),
+  .then((res: string[]) => res),
     retry: 1,
   });
 
@@ -96,7 +96,7 @@ export const useGetCities = () => {
         .url("/cities")
         .get()
         .json<string[]>()
-        .then((res) => res),
+  .then((res: string[]) => res),
     retry: 1,
   });
 

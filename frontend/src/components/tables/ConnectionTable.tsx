@@ -1,12 +1,12 @@
-import {
-  Box
-} from "@mui/material";
+import { Box, Button } from "@mui/material";
+import BookingModal from "../BookingModal";
+import { useState, useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo } from "react";
+// ...existing code...
 import type {
   ConnectionModel,
   RouteModel,
@@ -26,6 +26,8 @@ interface ConnectionTableProps {
 export default function ConnectionTable({
   searchFilters = {},
 }: ConnectionTableProps) {
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const searchConnectionsQuery = useSearchConnections(searchFilters, true);
 
   const connections = useMemo<ConnectionModel[]>(() => {
@@ -37,7 +39,7 @@ export default function ConnectionTable({
   }, [searchConnectionsQuery]);
 
   const routes = useMemo<RouteModel[]>(() => {
-    let routeList = connections.map((conn) => conn.routes[0]);
+    const routeList = connections.map((conn) => conn.routes[0]);
 
     return routeList;
   }, [connections]);
@@ -74,8 +76,7 @@ export default function ConnectionTable({
         accessorKey: "daysOfOperation",
         enableSorting: false,
 
-        Cell: ({ cell }: any) =>
-          getDisplayNameForDaysOfOperation(cell.getValue()),
+  Cell: ({ cell }: any) => getDisplayNameForDaysOfOperation(cell.getValue()),
       },
       {
         header: "First Class Ticket Rate",
@@ -91,7 +92,7 @@ export default function ConnectionTable({
         header: "Trip Duration",
         accessorKey: "tripDuration",
         enableSorting: true,
-        Cell: ({ cell }: any) => {
+  Cell: ({ cell }: any) => {
           const duration = cell.getValue() as number;
           const hours = Math.floor(duration);
           const minutes = Math.round((duration - hours) * 60);
@@ -105,9 +106,31 @@ export default function ConnectionTable({
           }
         },
       },
+      {
+        header: "Actions",
+        accessorKey: "routeId",
+        enableSorting: false,
+        Cell: ({ row }: any) => {
+          const route = row.original as RouteModel;
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleBook(route)}
+            >
+              Book
+            </Button>
+          );
+        },
+      },
     ],
     []
   );
+
+  function handleBook(route: RouteModel) {
+    setSelectedRouteId(route.routeId);
+    setBookingOpen(true);
+  }
 
   const table = useMaterialReactTable({
     columns,
@@ -135,9 +158,10 @@ export default function ConnectionTable({
   return (
     <>
       <Box sx={{ maxWidth: "90vw", overflowX: "auto" }}>
-        {!displayIndirectTable && <MaterialReactTable table={table} />}
+  {!displayIndirectTable && <MaterialReactTable table={table as any} />}
         {displayIndirectTable && <IndirectConnectionTable data={connections} />}
       </Box>
+  <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} routeIds={selectedRouteId ? [selectedRouteId] : []} />
     </>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
+import ViewTripModal from "../components/ViewTripModal";
 import ConnectionTable from "../components/tables/ConnectionTable";
 import SearchInterface from "../components/searchFilters/SearchInterface";
 import type { SearchFilters } from "../models/models";
@@ -21,6 +22,11 @@ export default function IndexView() {
     setHasSearched(false);
   };
 
+  const [viewOpen, setViewOpen] = useState(false);
+
+  const openView = () => setViewOpen(true);
+  const closeView = () => setViewOpen(false);
+
   return (
     <Box sx={{ p: 3 }}>
       {!hasSearched && (
@@ -29,7 +35,11 @@ export default function IndexView() {
         </Typography>
       )}
 
-      <SearchInterface onSearch={handleSearch} onClear={handleClear} />
+      <SearchInterface
+        onSearch={handleSearch}
+        onClear={handleClear}
+        rightAction={<Button variant="outlined" onClick={openView}>View Trip</Button>}
+      />
 
       {hasSearched && (
         <Box sx={{ mt: 3 }}>
@@ -39,6 +49,8 @@ export default function IndexView() {
           <ConnectionTable searchFilters={searchFilters} />
         </Box>
       )}
+
+      <ViewTripModal open={viewOpen} onClose={closeView} />
     </Box>
   );
 }

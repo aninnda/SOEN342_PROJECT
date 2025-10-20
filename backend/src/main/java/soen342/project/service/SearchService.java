@@ -15,11 +15,17 @@ public class SearchService {
     public SearchResponseModel search(SearchCriteria criteria) {
         List<Connection> connections = new ArrayList<>();
 
+        // Debug: log search criteria
+        System.out.println("[DEBUG] Search criteria: " + criteria);
+
         // Get all routes from database
         List<Route> allRoutes = Database.getInstance().getRoutes();
 
         // Apply filters to routes
         List<Route> filteredRoutes = filterRoutes(allRoutes, criteria);
+
+        // Debug: log number of direct connections found
+        System.out.println("[DEBUG] Direct connections found: " + filteredRoutes.size());
 
         // Convert filtered routes to connections
         for (Route route : filteredRoutes) {
@@ -34,6 +40,9 @@ public class SearchService {
                 containsIndirectConnections = true;
             }
         }
+
+        // Debug: log number of connections returned
+        System.out.println("[DEBUG] Total connections returned: " + connections.size());
 
         return new SearchResponseModel(connections, containsIndirectConnections);
     }
