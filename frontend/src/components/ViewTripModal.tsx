@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText } from "@mui/material";
-import { lookupBookings, lookupBookingsByTripReference } from "../queries/bookingLookupApi";
+import { lookupBookings, lookupBookingsByTripReference, useGetAllBookings } from "../queries/bookingLookupApi";
 import type { BookingResult } from "../queries/bookingLookupApi";
 
 type Props = {
@@ -15,6 +15,10 @@ export default function ViewTripModal({ open, onClose }: Props) {
   const [results, setResults] = useState<BookingResult[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+
+  const allBookingsQuery = useGetAllBookings();
+
 
   async function handleLookup() {
     setError(null);
@@ -106,6 +110,10 @@ export default function ViewTripModal({ open, onClose }: Props) {
         <Button onClick={onClose}>Close</Button>
         <Button onClick={handleLookup} disabled={loading} variant="contained">
           {loading ? "Searching..." : "Search"}
+        </Button>
+
+        <Button onClick={() => allBookingsQuery.refetch()}>
+          just give me them all
         </Button>
       </DialogActions>
     </Dialog>
