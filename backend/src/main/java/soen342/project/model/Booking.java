@@ -1,11 +1,20 @@
 package soen342.project.model;
 
+import java.util.List;
+
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "bookings")
 public class Booking {
 
     @Id
@@ -15,12 +24,17 @@ public class Booking {
     private String passengerName;
     private Integer passengerAge;
     private String passengerIdentifier; // mix of letters and numbers
-    private java.util.List<String> routeIds;
+    
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "booking_route_ids", joinColumns = @JoinColumn(name = "booking_id"))
+    @Column(name = "route_id")
+    private List<String> routeIds;
+    
     private String tripReference;
 
     public Booking() {}
 
-    public Booking(String passengerName, Integer passengerAge, String passengerIdentifier, java.util.List<String> routeIds, String tripReference) {
+    public Booking(String passengerName, Integer passengerAge, String passengerIdentifier, List<String> routeIds, String tripReference) {
         this.passengerName = passengerName;
         this.passengerAge = passengerAge;
         this.passengerIdentifier = passengerIdentifier;
@@ -63,11 +77,11 @@ public class Booking {
         this.passengerIdentifier = passengerIdentifier;
     }
 
-    public java.util.List<String> getRouteIds() {
+    public List<String> getRouteIds() {
         return routeIds;
     }
 
-    public void setRouteIds(java.util.List<String> routeIds) {
+    public void setRouteIds(List<String> routeIds) {
         this.routeIds = routeIds;
     }
 }

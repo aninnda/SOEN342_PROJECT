@@ -64,7 +64,6 @@ export const useSearchConnections = (
         .json<SearchResponseModel>()
       .then((res: SearchResponseModel) => res);
     },
-    retry: 1,
     enabled: enabled,
   });
 

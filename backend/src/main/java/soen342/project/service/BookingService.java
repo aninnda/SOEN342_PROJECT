@@ -2,6 +2,7 @@ package soen342.project.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import soen342.project.DTOs.RouteDetails;
 import soen342.project.DTOs.TicketResponse;
@@ -25,6 +26,7 @@ public class BookingService {
     /**
      * Creates a new booking and generates a trip reference if not provided
      */
+    @Transactional
     public Map<String, Object> createBooking(Booking booking) {
         // If no tripReference is provided, generate a new one (for single bookings)
         if (booking.getTripReference() == null || booking.getTripReference().isEmpty()) {
