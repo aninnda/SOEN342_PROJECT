@@ -62,8 +62,8 @@ export type TravelerModel = {
   age: number;
 };
 
-export type BookingModel = {
-  bookingId: string;
+export type TripModel = {
+  id: number; // TODO revise
   traveler: TravelerModel;
   routeIds: string[];
   tripReference: string;

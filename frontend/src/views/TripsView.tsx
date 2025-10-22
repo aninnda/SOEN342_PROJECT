@@ -2,9 +2,6 @@ import { Grid, Paper, TextField } from "@mui/material";
 import { useState } from "react";
 import { TripResults } from "../components/trips/TripResults";
 
-/**
- * Main view that combines search interface with results table
- */
 export default function TripsView() {
   const [identifier, setIdentifier] = useState<string>("");
   const [name, setName] = useState<string>("");

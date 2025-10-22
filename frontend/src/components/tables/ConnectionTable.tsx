@@ -1,11 +1,11 @@
 import { Box, Button } from "@mui/material";
-import BookingModal from "../BookingModal";
-import { useState, useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
+import { useMemo, useState } from "react";
+import BookingDialog from "../BookingDialog";
 // ...existing code...
 import type {
   ConnectionModel,
@@ -26,7 +26,7 @@ interface ConnectionTableProps {
 export default function ConnectionTable({
   searchFilters = {},
 }: ConnectionTableProps) {
-  const [bookingOpen, setBookingOpen] = useState(false);
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const searchConnectionsQuery = useSearchConnections(searchFilters, true);
 
@@ -131,7 +131,7 @@ export default function ConnectionTable({
 
   function handleBook(route: RouteModel) {
     setSelectedRouteId(route.routeId);
-    setBookingOpen(true);
+    setIsBookingDialogOpen(true);
   }
 
   const table = useMaterialReactTable({
@@ -163,9 +163,9 @@ export default function ConnectionTable({
         {!displayIndirectTable && <MaterialReactTable table={table as any} />}
         {displayIndirectTable && <IndirectConnectionTable data={connections} />}
       </Box>
-      <BookingModal
-        open={bookingOpen}
-        onClose={() => setBookingOpen(false)}
+      <BookingDialog
+        open={isBookingDialogOpen}
+        onClose={() => setIsBookingDialogOpen(false)}
         routeIds={selectedRouteId ? [selectedRouteId] : []}
       />
     </>

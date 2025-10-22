@@ -9,47 +9,47 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import soen342.project.DTOs.TicketResponse;
-import soen342.project.model.Booking;
-import soen342.project.service.BookingService;
+import soen342.project.model.Trip;
+import soen342.project.service.TripService;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" })
-public class BookingController {
+public class TripController {
 
     @Autowired
-    private BookingService bookingService;
+    private TripService tripService;
 
-    @PostMapping("/bookings")
-    public ResponseEntity<Map<String, Object>> createBooking(@RequestBody Booking booking) {
-        Map<String, Object> response = bookingService.createBooking(booking);
-        Booking savedBooking = (Booking) response.get("booking");
-        return ResponseEntity.created(URI.create("/bookings/" + savedBooking.getId())).body(response);
+    @PostMapping("/trips")
+    public ResponseEntity<Map<String, Object>> createTrip(@RequestBody Trip trip) {
+        Map<String, Object> response = tripService.createTrip(trip);
+        Trip savedTrip = (Trip) response.get("trip");
+        return ResponseEntity.created(URI.create("/trips/" + savedTrip.getId())).body(response);
     }
 
-    // Search bookings by trip reference number
-    @GetMapping("/bookings/searchByTripReference")
+    // Search trips by trip reference number
+    @GetMapping("/trips/searchByTripReference")
     public ResponseEntity<List<TicketResponse>> searchByTripReference(
             @org.springframework.web.bind.annotation.RequestParam(value = "tripReference") String tripReference) {
-        List<TicketResponse> tickets = bookingService.searchByTripReference(tripReference);
+        List<TicketResponse> tickets = tripService.searchByTripReference(tripReference);
         return ResponseEntity.ok(tickets);
     }
 
-    // Search bookings by identifier and last name fragment
-    @GetMapping("/bookings/search")
-    public ResponseEntity<List<TicketResponse>> searchBookings(
+    // Search trips by identifier and last name fragment
+    @GetMapping("/trips/search")
+    public ResponseEntity<List<TicketResponse>> searchTrips(
             @org.springframework.web.bind.annotation.RequestParam(value = "identifier") String identifier,
             @org.springframework.web.bind.annotation.RequestParam(value = "name", required = false) String name) {
-        List<TicketResponse> tickets = bookingService.searchBookings(identifier, name);
+        List<TicketResponse> tickets = tripService.searchTrips(identifier, name);
         return ResponseEntity.ok(tickets);
     }
 
-    // Get all bookings
-    @GetMapping("/bookings")
-    public ResponseEntity<List<TicketResponse>> getAllBookings() {
-        List<TicketResponse> tickets = bookingService.getAllBookings();
+    // Get all trips
+    @GetMapping("/trips")
+    public ResponseEntity<List<TicketResponse>> getAllTrips() {
+        List<TicketResponse> tickets = tripService.getAllTrips();
         return ResponseEntity.ok(tickets);
     }
 

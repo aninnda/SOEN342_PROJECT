@@ -10,19 +10,19 @@ import {
   Typography,
 } from "@mui/material";
 import { useState } from "react";
-import { createBooking } from "../queries/bookingApi";
+import { createTrip } from "../queries/tripQueries";
 
-type BookingModalProps = {
+type BookingDialogProps = {
   open: boolean;
   onClose: () => void;
   routeIds: string[];
 };
 
-export default function BookingModal({
+export default function BookingDialog({
   open,
   onClose,
   routeIds,
-}: BookingModalProps) {
+}: BookingDialogProps) {
   const [numTravelers, setNumTravelers] = useState(1);
   const [travelers, setTravelers] = useState([
     { name: "", age: "", identifier: "" },
@@ -73,7 +73,7 @@ export default function BookingModal({
     try {
       let lastResponse;
       for (const payload of payloads) {
-        lastResponse = await createBooking(payload);
+        lastResponse = await createTrip(payload);
       }
       setTripReference(lastResponse.tripReference || tripReferenceValue);
     } catch (err: any) {
@@ -177,7 +177,7 @@ export default function BookingModal({
             onClose();
           }}
         >
-          <DialogTitle>Booking Complete</DialogTitle>
+          <DialogTitle>Trip Complete</DialogTitle>
           <DialogContent>
             <Typography gutterBottom>Your trip reference number:</Typography>
             <Typography variant="h6" color="primary">

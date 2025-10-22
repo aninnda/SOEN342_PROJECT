@@ -1,9 +1,12 @@
+import InfoIcon from "@mui/icons-material/Info";
+import { Alert, Box, Button, Tooltip } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
+import { useMemo, useState } from "react";
 import type {
   ConnectionModel,
   LayoverModel,
@@ -13,12 +16,7 @@ import {
   formatDuration,
   getDisplayNameForDaysOfOperation,
 } from "../../utils/dateUtils";
-import { useMemo } from "react";
-import { Alert, Box, Tooltip } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
-import { Button } from "@mui/material";
-import BookingModal from "../BookingModal";
-import { useState } from "react";
+import BookingDialog from "../BookingDialog";
 
 type IndirectConnectionTableProps = {
   data: ConnectionModel[];
@@ -33,7 +31,7 @@ type ExtendedRouteModel = RouteModel & {
 export default function IndirectConnectionTable(
   props: IndirectConnectionTableProps
 ) {
-  const [bookingOpen, setBookingOpen] = useState(false);
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedRouteIds, setSelectedRouteIds] = useState<string[]>([]);
   const extendedRoutes = useMemo<ExtendedRouteModel[]>(() => {
     const routes: ExtendedRouteModel[] = [];
@@ -78,7 +76,7 @@ export default function IndirectConnectionTable(
               color="primary"
               onClick={() => {
                 setSelectedRouteIds(routeIds);
-                setBookingOpen(true);
+                setIsBookingDialogOpen(true);
               }}
             >
               Book
@@ -231,8 +229,6 @@ export default function IndirectConnectionTable(
     []
   );
 
-  // booking handled via BookingModal; handleBook removed
-
   const table = useMaterialReactTable({
     columns,
     data: extendedRoutes,
@@ -287,9 +283,9 @@ export default function IndirectConnectionTable(
         </Alert>
       </Box>
       <MaterialReactTable table={table as any} />
-      <BookingModal
-        open={bookingOpen}
-        onClose={() => setBookingOpen(false)}
+      <BookingDialog
+        open={isBookingDialogOpen}
+        onClose={() => setIsBookingDialogOpen(false)}
         routeIds={selectedRouteIds}
       />
     </>

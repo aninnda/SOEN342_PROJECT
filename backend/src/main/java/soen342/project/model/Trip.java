@@ -14,8 +14,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "bookings")
-public class Booking {
+@Table(name = "trips")
+public class Trip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,15 +26,15 @@ public class Booking {
     private String travelerIdentifier; // mix of letters and numbers
     
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "booking_route_ids", joinColumns = @JoinColumn(name = "booking_id"))
+    @CollectionTable(name = "trip_route_ids", joinColumns = @JoinColumn(name = "trip_id"))
     @Column(name = "route_id")
     private List<String> routeIds;
     
     private String tripReference;
 
-    public Booking() {}
+    public Trip() {}
 
-    public Booking(String travelerName, Integer travelerAge, String travelerIdentifier, List<String> routeIds, String tripReference) {
+    public Trip(String travelerName, Integer travelerAge, String travelerIdentifier, List<String> routeIds, String tripReference) {
         this.travelerName = travelerName;
         this.travelerAge = travelerAge;
         this.travelerIdentifier = travelerIdentifier;

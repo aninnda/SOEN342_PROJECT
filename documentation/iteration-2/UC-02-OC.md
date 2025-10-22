@@ -33,9 +33,9 @@ To allow a traveler to view details of their past, current, or upcoming trips.
 ---
 ## Extensions
 ### Included Use Case:
--   **Load Records** retrieves the traveler's booking information from the database.
+-   **Load Records** retrieves the traveler's trip information from the database.
 
-### No Bookings found
+### No trips found
 - If no trips are found for the entered credentials, the system displays a message indicating that no records exist.
 
 - If the provided information is invalid or incomplete, the system prompts the client to re-enter it.

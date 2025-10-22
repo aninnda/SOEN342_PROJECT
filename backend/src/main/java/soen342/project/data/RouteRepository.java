@@ -17,7 +17,7 @@ import java.util.HashMap;
 /**
  * This class simulates a repository for Route data.
  * It currently reads route information from a CSV file and provides methods to access routes.
- * This is why it's not an interface extending JpaRepository like BookingRepository.
+ * This is why it's not an interface extending JpaRepository like TripRepository.
  */
 public class RouteRepository {
 
