@@ -1,9 +1,9 @@
 import api from "./api";
 
 export type BookingRequest = {
-  passengerName: string;
-  passengerAge: number;
-  passengerIdentifier: string;
+  travelerName: string;
+  travelerAge: number;
+  travelerIdentifier: string;
   routeIds: string[];
   tripReference?: string;
 };

@@ -21,9 +21,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String passengerName;
-    private Integer passengerAge;
-    private String passengerIdentifier; // mix of letters and numbers
+    private String travelerName;
+    private Integer travelerAge;
+    private String travelerIdentifier; // mix of letters and numbers
     
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "booking_route_ids", joinColumns = @JoinColumn(name = "booking_id"))
@@ -34,10 +34,10 @@ public class Booking {
 
     public Booking() {}
 
-    public Booking(String passengerName, Integer passengerAge, String passengerIdentifier, List<String> routeIds, String tripReference) {
-        this.passengerName = passengerName;
-        this.passengerAge = passengerAge;
-        this.passengerIdentifier = passengerIdentifier;
+    public Booking(String travelerName, Integer travelerAge, String travelerIdentifier, List<String> routeIds, String tripReference) {
+        this.travelerName = travelerName;
+        this.travelerAge = travelerAge;
+        this.travelerIdentifier = travelerIdentifier;
         this.routeIds = routeIds;
         this.tripReference = tripReference;
     }
@@ -53,28 +53,28 @@ public class Booking {
         return id;
     }
 
-    public String getPassengerName() {
-        return passengerName;
+    public String gettravelerName() {
+        return travelerName;
     }
 
-    public void setPassengerName(String passengerName) {
-        this.passengerName = passengerName;
+    public void settravelerName(String travelerName) {
+        this.travelerName = travelerName;
     }
 
-    public Integer getPassengerAge() {
-        return passengerAge;
+    public Integer gettravelerAge() {
+        return travelerAge;
     }
 
-    public void setPassengerAge(Integer passengerAge) {
-        this.passengerAge = passengerAge;
+    public void settravelerAge(Integer travelerAge) {
+        this.travelerAge = travelerAge;
     }
 
-    public String getPassengerIdentifier() {
-        return passengerIdentifier;
+    public String gettravelerIdentifier() {
+        return travelerIdentifier;
     }
 
-    public void setPassengerIdentifier(String passengerIdentifier) {
-        this.passengerIdentifier = passengerIdentifier;
+    public void settravelerIdentifier(String travelerIdentifier) {
+        this.travelerIdentifier = travelerIdentifier;
     }
 
     public List<String> getRouteIds() {

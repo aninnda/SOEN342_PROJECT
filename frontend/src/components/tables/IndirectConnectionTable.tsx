@@ -58,6 +58,39 @@ export default function IndirectConnectionTable(
   const columns = useMemo<MRT_ColumnDef<ExtendedRouteModel>[]>(
     () => [
       {
+        header: "",
+        accessorKey: "routeId",
+        enableSorting: false,
+        enableGrouping: false,
+        AggregatedCell: ({ row }: any) => {
+          const route = row.original as ExtendedRouteModel;
+          // Find the full connection for this route
+          const connection = props.data.find(
+            (conn) =>
+              route.connectionId === conn.routes.map((r) => r.routeId).join("-")
+          );
+          const routeIds = connection
+            ? connection.routes.map((r) => r.routeId)
+            : [route.routeId];
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setSelectedRouteIds(routeIds);
+                setBookingOpen(true);
+              }}
+            >
+              Book
+            </Button>
+          );
+        },
+        Cell: () => {
+          return null; // only display book button in aggregated cell
+        },
+        size: 105, 
+      },
+      {
         header: "Connection",
         accessorKey: "connectionId",
         enableSorting: false,
@@ -67,7 +100,9 @@ export default function IndirectConnectionTable(
 
           const routes =
             props.data.find(
-              (conn) => connectionId === conn.routes.map((route) => route.routeId).join("-")
+              (conn) =>
+                connectionId ===
+                conn.routes.map((route) => route.routeId).join("-")
             )?.routes ?? [];
 
           const cities = new Set<string>(routes.map((r) => r.departureCity));
@@ -192,29 +227,6 @@ export default function IndirectConnectionTable(
           );
         },
       },
-      {
-        header: "Actions",
-        accessorKey: "routeId",
-        enableSorting: false,
-        enableGrouping: false,
-        Cell: ({ row }: any) => {
-          const route = row.original as ExtendedRouteModel;
-          // Find the full connection for this route
-          const connection = props.data.find(
-            (conn) => route.connectionId === conn.routes.map((r) => r.routeId).join("-")
-          );
-          const routeIds = connection ? connection.routes.map((r) => r.routeId) : [route.routeId];
-          return (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => { setSelectedRouteIds(routeIds); setBookingOpen(true); }}
-            >
-              Book
-            </Button>
-          );
-        },
-      },
     ],
     []
   );
@@ -244,15 +256,21 @@ export default function IndirectConnectionTable(
     // grouping for connections
     enableGrouping: true,
     groupedColumnMode: false,
-  initialState: ({ grouping: ["connectionId"], expanded: true } as any),
+    initialState: { grouping: ["connectionId"], expanded: true } as any,
     paginateExpandedRows: false,
 
     // styling
     displayColumnDefOptions: {
       "mrt-row-expand": {
-        muiTableBodyCellProps: ({ row }: { row: MRT_Row<ExtendedRouteModel> }) => ({
+        muiTableBodyCellProps: ({
+          row,
+        }: {
+          row: MRT_Row<ExtendedRouteModel>;
+        }) => ({
           sx: (theme: any) => ({
-            backgroundColor: row.getIsGrouped() ? theme.palette.primary.dark : "",
+            backgroundColor: row.getIsGrouped()
+              ? theme.palette.primary.dark
+              : "",
           }),
         }),
         size: 10,
@@ -263,13 +281,17 @@ export default function IndirectConnectionTable(
   return (
     <>
       <Box>
-        <Alert severity="info" variant="outlined" sx={{my: 2}}>
+        <Alert severity="info" variant="outlined" sx={{ my: 2 }}>
           No direct connections were found. Displaying indirect connections
           instead.
         </Alert>
       </Box>
       <MaterialReactTable table={table as any} />
-      <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} routeIds={selectedRouteIds} />
+      <BookingModal
+        open={bookingOpen}
+        onClose={() => setBookingOpen(false)}
+        routeIds={selectedRouteIds}
+      />
     </>
   );
 }

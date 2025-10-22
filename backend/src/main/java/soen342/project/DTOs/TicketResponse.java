@@ -4,16 +4,16 @@ import java.util.List;
 
 public class TicketResponse {
     private Long ticketId;
-    private String passengerName;
-    private String passengerIdentifier;
+    private String travelerName;
+    private String travelerIdentifier;
     private String tripReference;
     private List<RouteDetails> routes;
 
-    public TicketResponse(Long ticketId, String passengerName, String passengerIdentifier, String tripReference,
+    public TicketResponse(Long ticketId, String travelerName, String travelerIdentifier, String tripReference,
             List<RouteDetails> routes) {
         this.ticketId = ticketId;
-        this.passengerName = passengerName;
-        this.passengerIdentifier = passengerIdentifier;
+        this.travelerName = travelerName;
+        this.travelerIdentifier = travelerIdentifier;
         this.tripReference = tripReference;
         this.routes = routes;
     }
@@ -22,12 +22,12 @@ public class TicketResponse {
         return ticketId;
     }
 
-    public String getPassengerName() {
-        return passengerName;
+    public String gettravelerName() {
+        return travelerName;
     }
 
-    public String getPassengerIdentifier() {
-        return passengerIdentifier;
+    public String gettravelerIdentifier() {
+        return travelerIdentifier;
     }
 
     public String getTripReference() {

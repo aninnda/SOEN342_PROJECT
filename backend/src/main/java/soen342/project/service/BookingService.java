@@ -9,7 +9,7 @@ import soen342.project.DTOs.TicketResponse;
 import soen342.project.data.BookingRepository;
 import soen342.project.model.Booking;
 import soen342.project.model.Route;
-import soen342.project.data.Database;
+import soen342.project.data.RouteRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,9 +54,9 @@ public class BookingService {
     public List<TicketResponse> searchBookings(String identifier, String name) {
         List<Booking> bookings;
         if (name == null || name.isBlank()) {
-            bookings = bookingRepository.findByPassengerIdentifier(identifier);
+            bookings = bookingRepository.findBytravelerIdentifier(identifier);
         } else {
-            bookings = bookingRepository.findByPassengerIdentifierAndPassengerNameContainingIgnoreCase(identifier,
+            bookings = bookingRepository.findBytravelerIdentifierAndTravelerNameContainingIgnoreCase(identifier,
                     name);
         }
         return buildTicketResponses(bookings);
@@ -78,7 +78,7 @@ public class BookingService {
         for (Booking booking : bookings) {
             List<RouteDetails> routeDetailsList = new ArrayList<>();
             for (String routeId : booking.getRouteIds()) {
-                Route route = Database.getInstance().getRoutes().stream()
+                Route route = RouteRepository.getInstance().getRoutes().stream()
                         .filter(r -> r.getRouteId().equals(routeId))
                         .findFirst().orElse(null);
                 if (route != null) {
@@ -93,8 +93,8 @@ public class BookingService {
             }
             tickets.add(new TicketResponse(
                     booking.getId(),
-                    booking.getPassengerName(),
-                    booking.getPassengerIdentifier(),
+                    booking.gettravelerName(),
+                    booking.gettravelerIdentifier(),
                     booking.getTripReference(),
                     routeDetailsList));
         }

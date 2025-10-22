@@ -58,3 +58,11 @@ export type SearchFilters = {
   maxSecondClassPrice?: number;
   dayOfWeek?: DayOfWeek | null;
 }
+
+
+export type TravelerModel = {
+
+
+
+
+}

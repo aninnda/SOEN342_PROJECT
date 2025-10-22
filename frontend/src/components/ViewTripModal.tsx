@@ -82,8 +82,8 @@ export default function ViewTripModal({ open, onClose }: Props) {
                     primary={
                       <>
                         <strong>Ticket ID:</strong> {r.ticketId}<br />
-                        <strong>Name:</strong> {r.passengerName}<br />
-                        <strong>Identifier:</strong> {r.passengerIdentifier}<br />
+                        <strong>Name:</strong> {r.travelerName}<br />
+                        <strong>Identifier:</strong> {r.travelerIdentifier}<br />
                         <strong>Trip Reference:</strong> {r.tripReference}
                       </>
                     }

@@ -13,8 +13,8 @@ export type RouteDetails = {
 
 export type BookingResult = {
   ticketId: number;
-  passengerName: string;
-  passengerIdentifier: string;
+  travelerName: string;
+  travelerIdentifier: string;
   tripReference: string;
   routes: RouteDetails[];
 };
