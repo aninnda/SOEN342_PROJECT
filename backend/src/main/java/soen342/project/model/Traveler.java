@@ -7,42 +7,58 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "travelers")
 public class Traveler {
-    
+
     @Id
-    private String identifier;
-    
-    private String name;
+    private String id;
+
+    private String firstName;
+    private String lastName;
     private Integer age;
-    
-    public Traveler() {}
-    
-    public Traveler(String name, Integer age, String identifier) {
-        this.name = name;
+
+    public Traveler() {
+    }
+
+    public Traveler(String id, String firstName, String lastName, Integer age) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.age = age;
-        this.identifier = identifier;
     }
-    
-    public String getName() {
-        return name;
+
+    public String getId() {
+        return id;
     }
-    
-    public void setName(String name) {
-        this.name = name;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getFullName() {
+        return firstName + " " + lastName;
     }
     
     public Integer getAge() {
         return age;
     }
-    
+
     public void setAge(Integer age) {
         this.age = age;
     }
-    
-    public String getIdentifier() {
-        return identifier;
-    }
-    
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
-    }
+
 }

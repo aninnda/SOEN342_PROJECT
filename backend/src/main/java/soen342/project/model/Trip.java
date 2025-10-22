@@ -1,5 +1,6 @@
 package soen342.project.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.CollectionTable;
@@ -11,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,60 +24,42 @@ public class Trip {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String travelerName;
-    private Integer travelerAge;
-    private String travelerIdentifier; // mix of letters and numbers
-    
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "trip_travelers",
+            joinColumns = @JoinColumn(name = "trip_id"),
+            inverseJoinColumns = @JoinColumn(name = "traveler_id"))
+    private List<Traveler> travelers;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "trip_route_ids", joinColumns = @JoinColumn(name = "trip_id"))
     @Column(name = "route_id")
     private List<String> routeIds;
-    
-    private String tripReference;
 
-    public Trip() {}
+    private LocalDateTime initialDepartureDateTime;
 
-    public Trip(String travelerName, Integer travelerAge, String travelerIdentifier, List<String> routeIds, String tripReference) {
-        this.travelerName = travelerName;
-        this.travelerAge = travelerAge;
-        this.travelerIdentifier = travelerIdentifier;
+    public Trip() {
+    }
+
+    public Trip(List<Traveler> travelers, List<String> routeIds, LocalDateTime initialDepartureDateTime) {
+        this.travelers = travelers;
         this.routeIds = routeIds;
-        this.tripReference = tripReference;
-    }
-    public String getTripReference() {
-        return tripReference;
-    }
-
-    public void setTripReference(String tripReference) {
-        this.tripReference = tripReference;
+        this.initialDepartureDateTime = initialDepartureDateTime;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String gettravelerName() {
-        return travelerName;
+    public List<Traveler> getTravelers() {
+        return travelers;
     }
 
-    public void settravelerName(String travelerName) {
-        this.travelerName = travelerName;
+    public LocalDateTime getInitialDepartureDateTime() {
+        return initialDepartureDateTime;
     }
 
-    public Integer gettravelerAge() {
-        return travelerAge;
-    }
-
-    public void settravelerAge(Integer travelerAge) {
-        this.travelerAge = travelerAge;
-    }
-
-    public String gettravelerIdentifier() {
-        return travelerIdentifier;
-    }
-
-    public void settravelerIdentifier(String travelerIdentifier) {
-        this.travelerIdentifier = travelerIdentifier;
+    public void setTravelers(List<Traveler> travelers) {
+        this.travelers = travelers;
     }
 
     public List<String> getRouteIds() {

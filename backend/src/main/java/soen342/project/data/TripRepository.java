@@ -1,17 +1,20 @@
 package soen342.project.data;
 
 import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+
 import soen342.project.model.Trip;
 
 public interface TripRepository extends JpaRepository<Trip, Long> {
-	// Find trips by identifier and name fragment (useful for last-name search)
-	List<Trip> findBytravelerIdentifierAndTravelerNameContainingIgnoreCase(String travelerIdentifier, String travelerName);
+    // Find trips by traveler identifier
 
-	// convenience: find by identifier only
-	List<Trip> findBytravelerIdentifier(String travelerIdentifier);
+    List<Trip> findByTraveler_Identifier(String travelerIdentifier);
 
-	// Find trips by trip reference
-	List<Trip> findByTripReference(String tripReference);
+    // Find trips by traveler identifier and name fragment (useful for last-name search)
+    List<Trip> findByTraveler_IdentifierAndTraveler_NameContainingIgnoreCase(String travelerIdentifier, String travelerName);
+
+    // Find trips by trip ID
+    List<Trip> findById(String id);
 
 }

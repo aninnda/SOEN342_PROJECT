@@ -8,12 +8,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import soen342.project.DTOs.TicketResponse;
 import soen342.project.model.Trip;
 import soen342.project.service.TripService;
+
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.bind.annotation.RequestParam;
+
+import soen342.project.model.Ticket;
 
 @RestController
 @CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" })
@@ -30,26 +34,41 @@ public class TripController {
     }
 
     // Search trips by trip reference number
-    @GetMapping("/trips/searchByTripReference")
-    public ResponseEntity<List<TicketResponse>> searchByTripReference(
-            @org.springframework.web.bind.annotation.RequestParam(value = "tripReference") String tripReference) {
-        List<TicketResponse> tickets = tripService.searchByTripReference(tripReference);
-        return ResponseEntity.ok(tickets);
+    @GetMapping("/trips/searchByTripId")
+    public ResponseEntity<List<Trip>> searchByTripId(
+            @RequestParam(value = "tripId") String tripId) {
+        List<Trip> trips = tripService.searchByTripId(tripId);
+        return ResponseEntity.ok(trips);
     }
 
     // Search trips by identifier and last name fragment
     @GetMapping("/trips/search")
-    public ResponseEntity<List<TicketResponse>> searchTrips(
-            @org.springframework.web.bind.annotation.RequestParam(value = "identifier") String identifier,
-            @org.springframework.web.bind.annotation.RequestParam(value = "name", required = false) String name) {
-        List<TicketResponse> tickets = tripService.searchTrips(identifier, name);
-        return ResponseEntity.ok(tickets);
+    public ResponseEntity<List<Trip>> searchTrips(
+            @RequestParam(value = "identifier") String identifier,
+            @RequestParam(value = "name", required = false) String name) {
+        List<Trip> trips = tripService.searchTrips(identifier, name);
+        return ResponseEntity.ok(trips);
     }
 
     // Get all trips
     @GetMapping("/trips")
-    public ResponseEntity<List<TicketResponse>> getAllTrips() {
-        List<TicketResponse> tickets = tripService.getAllTrips();
+    public ResponseEntity<List<Trip>> getAllTrips() {
+        List<Trip> trips = tripService.getAllTrips();
+        return ResponseEntity.ok(trips);
+    }
+
+    // search for all tickets by trip id
+    @GetMapping("/tickets/search")
+    public ResponseEntity<List<Ticket>> searchTicketsByTripId(
+            @RequestParam(value = "tripId") String tripId) {
+        List<Ticket> tickets = tripService.searchTicketsByTripId(tripId);
+        return ResponseEntity.ok(tickets);
+    }
+
+    @GetMapping("/tickets/searchByTravelerId")
+    public ResponseEntity<List<Ticket>> searchByTravelerId(
+            @RequestParam(value = "travelerId") Long travelerId) {
+        List<Ticket> tickets = tripService.searchByTravelerId(travelerId);
         return ResponseEntity.ok(tickets);
     }
 
