@@ -46,6 +46,13 @@ public class Trip {
         this.initialDepartureDateTime = initialDepartureDateTime;
     }
 
+    public Trip(Trip trip) {
+        this.id = trip.id;
+        this.travelers = trip.travelers;
+        this.routeIds = trip.routeIds;
+        this.initialDepartureDateTime = trip.initialDepartureDateTime;
+    }
+
     public Long getId() {
         return id;
     }

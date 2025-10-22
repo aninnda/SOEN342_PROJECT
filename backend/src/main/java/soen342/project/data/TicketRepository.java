@@ -10,10 +10,10 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
 
     Ticket findById(long id);
 
-    List<Ticket> findByTravelerId(long travelerId);
+    List<Ticket> findByTraveler_Id(String travelerId);
 
-    List<Ticket> findByTripId(long tripId);
+    List<Ticket> findByTrip_Id(Long tripId);
 
-    Ticket findByTravelerIdAndTripId(long travelerId, long tripId);
+    Ticket findByTraveler_IdAndTrip_Id(String travelerId, Long tripId);
 
 }

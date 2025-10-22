@@ -13,7 +13,7 @@ import { useState } from "react";
 import type { TripResult } from "../queries/tripQueries";
 import {
   lookupTrips,
-  lookupTripsByTripReference,
+  lookupTripsByTripId,
   useGetAllTrips,
 } from "../queries/tripQueries";
 
@@ -39,7 +39,7 @@ export default function ViewTripModal({ open, onClose }: Props) {
     try {
       let res: TripResult[] = [];
       if (tripReference) {
-        res = await lookupTripsByTripReference(tripReference);
+        res = await lookupTripsByTripId(tripReference);
       } else if (identifier) {
         res = await lookupTrips(identifier, name || undefined);
       } else {

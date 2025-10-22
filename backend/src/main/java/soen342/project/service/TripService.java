@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import soen342.project.DTOs.DetailedTrip;
 import soen342.project.DTOs.RouteDetails;
 import soen342.project.data.RouteRepository;
 import soen342.project.data.TicketRepository;
@@ -69,7 +71,7 @@ public class TripService {
     private void createTicketsForTrip(Trip trip) {
         for (Traveler traveler : trip.getTravelers()) {
 
-            var ticket = new Ticket(traveler, trip, buildRouteDetails(trip));
+            var ticket = new Ticket(traveler, trip);
             ticketRepository.save(ticket);
         }
     }
@@ -78,30 +80,32 @@ public class TripService {
      * Search trips by trip reference number and return enriched ticket
      * responses
      */
-    public List<Trip> searchByTripId(String tripId) {
-        List<Trip> trips = tripRepository.findById(tripId);
-        return trips;
+    public List<DetailedTrip> searchByTripId(String tripId) {
+        List<Trip> trips = tripRepository.findById(Long.parseLong(tripId))
+                .map(trip -> new ArrayList<>(List.of(trip)))
+                .orElse(new ArrayList<>());
+        return constructDetailedTrips(trips);
     }
 
     /**
-     * Search trips by identifier and optional name fragment
+     * Search trips by traveler id and optional name fragment
      */
-    public List<Trip> searchTrips(String identifier, String name) {
+    public List<DetailedTrip> searchTrips(String travelerId, String name) {
         List<Trip> trips;
         if (name == null || name.isBlank()) {
-            trips = tripRepository.findByTraveler_Identifier(identifier);
+            trips = tripRepository.findByTravelers_Id(travelerId);
         } else {
-            trips = tripRepository.findByTraveler_IdentifierAndTraveler_NameContainingIgnoreCase(identifier,
+            trips = tripRepository.findByTravelers_IdAndTravelers_LastNameContainingIgnoreCase(travelerId,
                     name);
         }
-        return trips;
+        return constructDetailedTrips(trips);
     }
 
     /**
      * Get all trips
      */
-    public List<Trip> getAllTrips() {
-        return tripRepository.findAll();
+    public List<DetailedTrip> getAllTrips() {
+        return constructDetailedTrips(tripRepository.findAll());
     }
 
     private List<RouteDetails> buildRouteDetails(Trip trip) {
@@ -123,45 +127,20 @@ public class TripService {
         return routeDetailsList;
     }
 
-
     public List<Ticket> searchTicketsByTripId(String tripId) {
-        List<Ticket> tickets = ticketRepository.findByTripId(Long.parseLong(tripId));
+        List<Ticket> tickets = ticketRepository.findByTrip_Id(Long.parseLong(tripId));
         return tickets;
     }
 
-    public List<Ticket> searchByTravelerId(Long travelerId) {
-        List<Ticket> tickets = ticketRepository.findByTravelerId(travelerId);
+    public List<Ticket> searchByTravelerId(String travelerId) {
+        List<Ticket> tickets = ticketRepository.findByTraveler_Id(travelerId);
         return tickets;
     }
 
-    /**
-     * Helper method to build ticket responses from trips
-     */
-    // private List<TicketResponse> buildTicketResponses(List<Trip> trips) {
-    //     List<TicketResponse> tickets = new ArrayList<>();
-    //     for (Trip trip : trips) {
-    //         List<RouteDetails> routeDetailsList = new ArrayList<>();
-    //         for (String routeId : trip.getRouteIds()) {
-    //             Route route = RouteRepository.getInstance().getRoutes().stream()
-    //                     .filter(r -> r.getRouteId().equals(routeId))
-    //                     .findFirst().orElse(null);
-    //             if (route != null) {
-    //                 routeDetailsList.add(new RouteDetails(
-    //                         route.getRouteId(),
-    //                         route.getDepartureCity(),
-    //                         route.getArrivalCity(),
-    //                         route.getDepartureTime(),
-    //                         route.getArrivalTime(),
-    //                         route.getTripDuration()));
-    //             }
-    //         }
-    //         tickets.add(new TicketResponse(
-    //                 trip.getId(),
-    //                 trip.getTravelers().getFullName(),
-    //                 trip.getTraveler().getId(),
-    //                 trip.getTripReference(),
-    //                 routeDetailsList));
-    //     }
-    //     return tickets;
-    // }
+    private List<DetailedTrip> constructDetailedTrips(List<Trip> trips) {
+        return trips.stream()
+                .map(trip -> new DetailedTrip(trip, buildRouteDetails(trip)))
+                .collect(Collectors.toList());
+    }
+
 }

@@ -3,7 +3,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useMemo, useState } from "react";
 import { TripResults } from "../components/trips/TripResults";
 import {
-  useGetTripsByTravelerIdentifier,
+  useGetTripsByTravelerId,
   useGetTripsByTripReference,
 } from "../queries/tripQueries";
 
@@ -16,7 +16,7 @@ export default function TripsView() {
 
   const [showPlaceholder, setShowPlaceholder] = useState<boolean>(true);
 
-  const byIdentifierQuery = useGetTripsByTravelerIdentifier(identifier, name);
+  const byIdentifierQuery = useGetTripsByTravelerId(identifier, name);
 
   const byReferenceQuery = useGetTripsByTripReference(tripReference);
 

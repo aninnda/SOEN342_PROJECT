@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
+import soen342.project.DTOs.DetailedTrip;
 import soen342.project.model.Ticket;
 
 @RestController
@@ -35,25 +36,25 @@ public class TripController {
 
     // Search trips by trip reference number
     @GetMapping("/trips/searchByTripId")
-    public ResponseEntity<List<Trip>> searchByTripId(
+    public ResponseEntity<List<DetailedTrip>> searchByTripId(
             @RequestParam(value = "tripId") String tripId) {
-        List<Trip> trips = tripService.searchByTripId(tripId);
+        List<DetailedTrip> trips = tripService.searchByTripId(tripId);
         return ResponseEntity.ok(trips);
     }
 
-    // Search trips by identifier and last name fragment
-    @GetMapping("/trips/search")
-    public ResponseEntity<List<Trip>> searchTrips(
-            @RequestParam(value = "identifier") String identifier,
+    // Search trips by id and last name fragment
+    @GetMapping("/trips/searchByTravelerId")
+    public ResponseEntity<List<DetailedTrip>> searchTrips(
+            @RequestParam(value = "travelerId") String travelerId,
             @RequestParam(value = "name", required = false) String name) {
-        List<Trip> trips = tripService.searchTrips(identifier, name);
+        List<DetailedTrip> trips = tripService.searchTrips(travelerId, name);
         return ResponseEntity.ok(trips);
     }
 
     // Get all trips
     @GetMapping("/trips")
-    public ResponseEntity<List<Trip>> getAllTrips() {
-        List<Trip> trips = tripService.getAllTrips();
+    public ResponseEntity<List<DetailedTrip>> getAllTrips() {
+        List<DetailedTrip> trips = tripService.getAllTrips();
         return ResponseEntity.ok(trips);
     }
 
@@ -67,7 +68,7 @@ public class TripController {
 
     @GetMapping("/tickets/searchByTravelerId")
     public ResponseEntity<List<Ticket>> searchByTravelerId(
-            @RequestParam(value = "travelerId") Long travelerId) {
+            @RequestParam(value = "travelerId") String travelerId) {
         List<Ticket> tickets = tripService.searchByTravelerId(travelerId);
         return ResponseEntity.ok(tickets);
     }

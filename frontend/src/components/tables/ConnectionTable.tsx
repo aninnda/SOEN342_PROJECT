@@ -28,6 +28,8 @@ export default function ConnectionTable({
 }: ConnectionTableProps) {
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [selectedConnection, setSelectedConnection] =
+    useState<ConnectionModel>();
   const searchConnectionsQuery = useSearchConnections(searchFilters, true);
 
   const connections = useMemo<ConnectionModel[]>(() => {
@@ -130,6 +132,9 @@ export default function ConnectionTable({
   );
 
   function handleBook(route: RouteModel) {
+    setSelectedConnection(
+      connections.find((conn) => conn.routes.includes(route))
+    ); // works here because all routes are shown in at most one (direct) connection
     setSelectedRouteId(route.routeId);
     setIsBookingDialogOpen(true);
   }
@@ -167,6 +172,7 @@ export default function ConnectionTable({
         open={isBookingDialogOpen}
         onClose={() => setIsBookingDialogOpen(false)}
         routeIds={selectedRouteId ? [selectedRouteId] : []}
+        connection={selectedConnection}
       />
     </>
   );

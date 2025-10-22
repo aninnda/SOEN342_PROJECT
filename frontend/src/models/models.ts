@@ -57,14 +57,35 @@ export type SearchFilters = {
 };
 
 export type TravelerModel = {
-  identifier: string;
-  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   age: number;
 };
 
 export type TripModel = {
-  id: number; // TODO revise
-  traveler: TravelerModel;
+  id: number;
+  travelers: TravelerModel[];
   routeIds: string[];
-  tripReference: string;
+  initialDepartureDateTime: Dayjs;
+};
+
+export type RouteDetails = {
+  routeId: string;
+  departureCity: string;
+  arrivalCity: string;
+  departureTime: string;
+  arrivalTime: string;
+  tripDuration: number;
+};
+
+export type DetailedTripModel = TripModel & {
+  routes: RouteDetails[];
+};
+
+export type TicketModel = {
+  id: number;
+  traveler: TravelerModel;
+  trip: TripModel;
+  issuedAt: Dayjs;
 };

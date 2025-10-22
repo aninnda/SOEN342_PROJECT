@@ -2,6 +2,7 @@ package soen342.project.DTOs;
 
 import java.util.List;
 
+@Deprecated(forRemoval = true)
 public class TicketResponse {
     private Long ticketId;
     private String travelerName;

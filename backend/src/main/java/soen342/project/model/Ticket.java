@@ -28,13 +28,14 @@ public class Ticket {
     @JoinColumn(name = "trip_id", referencedColumnName = "id")
     private Trip trip;
 
-    private List<RouteDetails> routes;
     private LocalDateTime issuedAt;
 
-    public Ticket(Traveler traveler, Trip trip, List<RouteDetails> routes) {
+    public Ticket() {
+    }
+
+    public Ticket(Traveler traveler, Trip trip) {
         this.traveler = traveler;
         this.trip = trip;
-        this.routes = routes;
         issuedAt = LocalDateTime.now();
     }
 
@@ -48,10 +49,6 @@ public class Ticket {
 
     public Trip getTrip() {
         return trip;
-    }
-
-    public List<RouteDetails> getRoutes() {
-        return routes;
     }
 
     public LocalDateTime getIssuedAt() {
