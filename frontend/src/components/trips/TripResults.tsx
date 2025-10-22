@@ -4,71 +4,28 @@ import {
   List,
   ListItem,
   ListItemText,
-  debounce,
+  Typography,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
-import { useGetTripsByTravelerIdentifier } from "../../queries/tripQueries";
+import { type TripResult } from "../../queries/tripQueries";
 import { formatDuration } from "../../utils/dateUtils";
+import { useState } from "react";
 
 type Props = {
-  searchOptions: {
-    identifier: string;
-    name: string;
-    tripReference: string;
-  };
+  results: TripResult[] | undefined;
+  isLoading?: boolean;
 };
 
-export function TripResults({ searchOptions }: Props) {
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  const byIdentifierQuery = useGetTripsByTravelerIdentifier(
-    searchOptions.identifier,
-    searchOptions.name
-  );
-
-  const byReferenceQuery = useGetTripsByTravelerIdentifier(
-    searchOptions.tripReference
-  );
-
-  const data = useMemo(() => {
-    return searchOptions.tripReference
-      ? byReferenceQuery.data
-      : byIdentifierQuery.data;
-  }, [
-    byReferenceQuery.data,
-    byIdentifierQuery.data,
-    searchOptions.tripReference,
-  ]);
-
-  const debouncedRefetch = debounce(() => {
-    if (searchOptions.tripReference) {
-      byReferenceQuery.refetch();
-    } else {
-      byIdentifierQuery.refetch();
-    }
-  }, 1000); // Adjust debounce time as needed
-  useEffect(() => {
-    setIsSearching(true);
-
-    debouncedRefetch();
-
-    return () => {
-      debouncedRefetch.clear();
-      setIsSearching(false);
-    };
-  }, [searchOptions, byReferenceQuery, byIdentifierQuery]);
-
-  const isLoading =
-    data &&
-    (isSearching || byIdentifierQuery.isLoading || byReferenceQuery.isLoading);
+export function TripResults(props: Props) {
 
   return (
-    <Box sx={{ p: 1, minHeight: 200 }}>
-      {isLoading && (
+    <Box sx={{ p: 1, minHeight: 260 }}>
+      {props.isLoading ? (
         <CircularProgress sx={{ display: "flex", justifySelf: "center" }} />
+      ) : (
+        !props.results?.length && <Typography>No trips found.</Typography>
       )}
       <List>
-        {data?.map((item) => (
+        {props.results?.map((item) => (
           <ListItem key={item.ticketId} alignItems="flex-start">
             <ListItemText
               primary={

@@ -78,7 +78,7 @@ export const useGetTripsByTravelerIdentifier = (
   return query;
 };
 
-export const useGetTripByTripReference = (tripReference: string) => {
+export const useGetTripsByTripReference = (tripReference: string) => {
   const url = `/trips/searchByTripReference?tripReference=${encodeURIComponent(
     tripReference
   )}`;
