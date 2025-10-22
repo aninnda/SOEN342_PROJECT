@@ -1,8 +1,6 @@
 package soen342.project.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -11,12 +9,10 @@ import jakarta.persistence.Table;
 public class Traveler {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String identifier;
     
     private String name;
     private Integer age;
-    private String identifier;
     
     public Traveler() {}
     
@@ -24,14 +20,6 @@ public class Traveler {
         this.name = name;
         this.age = age;
         this.identifier = identifier;
-    }
-    
-    public Long getId() {
-        return id;
-    }
-    
-    public void setId(Long id) {
-        this.id = id;
     }
     
     public String getName() {

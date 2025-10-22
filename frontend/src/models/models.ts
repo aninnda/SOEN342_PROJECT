@@ -10,8 +10,7 @@ const DayOfWeek = {
   SUNDAY: "Sunday",
 } as const;
 
-export type DayOfWeek = typeof DayOfWeek[keyof typeof DayOfWeek];
-
+export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek];
 
 export type RouteModel = {
   routeId: string;
@@ -24,7 +23,7 @@ export type RouteModel = {
   firstClassTicketRate: number; // in euro
   secondClassTicketRate: number; // in euro
   tripDuration?: number; // format is hh:mm
-}
+};
 
 export type ConnectionModel = {
   routes: RouteModel[];
@@ -37,7 +36,6 @@ export type ConnectionModel = {
   layovers?: LayoverModel[];
 };
 
-
 export type LayoverModel = {
   startRoute: RouteModel;
   endRoute: RouteModel;
@@ -45,8 +43,7 @@ export type LayoverModel = {
   firstRouteEndDay: DayOfWeek;
   secondRouteStartDay: DayOfWeek;
   layoverDuration: number; // in hours
-}
-
+};
 
 export type SearchFilters = {
   departureCity?: string;
@@ -57,12 +54,17 @@ export type SearchFilters = {
   maxFirstClassPrice?: number;
   maxSecondClassPrice?: number;
   dayOfWeek?: DayOfWeek | null;
-}
-
+};
 
 export type TravelerModel = {
+  identifier: string;
+  name: string;
+  age: number;
+};
 
-
-
-
-}
+export type BookingModel = {
+  bookingId: string;
+  traveler: TravelerModel;
+  routeIds: string[];
+  tripReference: string;
+};

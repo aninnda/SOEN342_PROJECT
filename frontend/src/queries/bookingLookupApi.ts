@@ -37,8 +37,37 @@ export async function lookupBookingsByTripReference(tripReference: string) {
 
 export const useGetAllBookings = () => {
   const query = useQuery({
-    queryKey: ["get", "bookings"],
-    queryFn: () => api.url("/bookings").get().json(),
+    queryKey: ["get", "bookings", "all"],
+    queryFn: () => api.url("/bookings").get().json<BookingResult[]>(),
+    enabled: false, // disables automatic fetching, must be called via .refetch();
+  });
+  return query;
+};
+
+// useQuery versions
+export const useGetBookingsByTravelerIdentifier = (
+  identifier: string,
+  name?: string
+) => {
+  const url = `/bookings/search?identifier=${encodeURIComponent(identifier)}${
+    name ? `&name=${encodeURIComponent(name)}` : ""
+  }`;
+
+  const query = useQuery({
+    queryKey: ["get", "bookings", "byIdentifier", identifier],
+    queryFn: () => api.url(url).get().json<BookingResult[]>(),
+    enabled: false, // disables automatic fetching, must be called via .refetch();
+  });
+  return query;
+};
+
+export const useGetBookingByTripReference = (tripReference: string) => {
+  const url = `/bookings/searchByTripReference?tripReference=${encodeURIComponent(
+    tripReference
+  )}`;
+  const query = useQuery({
+    queryKey: ["get", "bookings", "byTripReference", tripReference],
+    queryFn: () => api.url(url).get().json<BookingResult[]>(),
     enabled: false, // disables automatic fetching, must be called via .refetch();
   });
   return query;

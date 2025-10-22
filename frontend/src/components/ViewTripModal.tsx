@@ -91,7 +91,7 @@ export default function ViewTripModal({ open, onClose }: Props) {
                       <>
                         {r.routes.map((route, idx) => (
                           <div key={route.routeId} style={{ marginBottom: 8 }}>
-                            <strong>Route {idx + 1}:</strong> {route.routeId}<br />
+                            <strong>Route {idx + 1}:</strong><br />
                             <strong>Cities:</strong> {route.departureCity} → {route.arrivalCity}<br />
                             <strong>Departure:</strong> {route.departureTime} &nbsp; <strong>Arrival:</strong> {route.arrivalTime}<br />
                             <strong>Duration:</strong> {route.tripDuration}h
