@@ -16,7 +16,7 @@ import {
   formatDuration,
   getDisplayNameForDaysOfOperation,
 } from "../../utils/dateUtils";
-import BookingDialog from "../BookingDialog";
+import BookingModal from "../BookingModal";
 
 type IndirectConnectionTableProps = {
   data: ConnectionModel[];
@@ -283,7 +283,7 @@ export default function IndirectConnectionTable(
         </Alert>
       </Box>
       <MaterialReactTable table={table as any} />
-      <BookingDialog
+      <BookingModal
         open={isBookingDialogOpen}
         onClose={() => setIsBookingDialogOpen(false)}
         routeIds={selectedRouteIds}

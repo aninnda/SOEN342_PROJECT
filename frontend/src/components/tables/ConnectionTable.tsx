@@ -5,7 +5,7 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useMemo, useState } from "react";
-import BookingDialog from "../BookingDialog";
+import BookingModal from "../BookingModal";
 // ...existing code...
 import type {
   ConnectionModel,
@@ -163,7 +163,7 @@ export default function ConnectionTable({
         {!displayIndirectTable && <MaterialReactTable table={table as any} />}
         {displayIndirectTable && <IndirectConnectionTable data={connections} />}
       </Box>
-      <BookingDialog
+      <BookingModal
         open={isBookingDialogOpen}
         onClose={() => setIsBookingDialogOpen(false)}
         routeIds={selectedRouteId ? [selectedRouteId] : []}
