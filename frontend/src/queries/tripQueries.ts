@@ -1,16 +1,31 @@
-import type { DetailedTripModel, TripModel } from "../models/models";
+import type { DetailedTripModel, TripCreationResponse, TripModel } from "../models/models";
 import api from "./api";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export async function createTrip(trip: TripModel) {
   const res = await api.url("/trips").post(trip).json<any>();
-  if (res && res.message === "Trip successful") {
+  if (res && res.message === "Trip created successfully") {
     return res;
   } else {
     throw new Error(res && res.message ? res.message : "Trip failed");
   }
 }
+
+export const useCreateTrip = () => {
+  const mutation = useMutation({
+    mutationFn: (trip: TripModel) =>
+      api.url("/trips").post(trip).json<TripCreationResponse>(),
+    onSuccess: (data) => {
+      console.log("Trip created successfully:", data);
+      return data;
+    },
+    onError: (error: any) => {
+      console.error("Booking error:", error);
+    },
+  });
+  return mutation;
+};
 
 export async function lookupTrips(identifier: string, name?: string) {
   let url = `/trips/search?identifier=${encodeURIComponent(identifier)}`;
@@ -36,13 +51,10 @@ export const useGetAllTrips = () => {
 };
 
 // useQuery versions
-export const useGetTripsByTravelerId = (
-  identifier: string,
-  name?: string
-) => {
-  const url = `/trips/searchByTravelerId?travelerId=${encodeURIComponent(identifier)}${
-    name ? `&name=${encodeURIComponent(name)}` : ""
-  }`;
+export const useGetTripsByTravelerId = (identifier: string, name?: string) => {
+  const url = `/trips/searchByTravelerId?travelerId=${encodeURIComponent(
+    identifier
+  )}${name ? `&name=${encodeURIComponent(name)}` : ""}`;
 
   const query = useQuery({
     queryKey: ["get", "trips", "byIdentifier", identifier],

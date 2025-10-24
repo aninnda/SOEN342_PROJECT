@@ -4,7 +4,7 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import BookingModal from "../BookingModal";
 // ...existing code...
 import type {
@@ -46,6 +46,16 @@ export default function ConnectionTable({
     return routeList;
   }, [connections]);
 
+
+  /**
+   * i won't lie i don't know how useCallback works exactly
+   */
+  const handleBook = useCallback((route: RouteModel, connection: ConnectionModel | undefined) => {
+    setSelectedConnection(connection);
+    setSelectedRouteId(route.routeId);
+    setIsBookingDialogOpen(true);
+  }, [routes]);
+  
   const columns = useMemo<MRT_ColumnDef<RouteModel>[]>(
     () => [
       {
@@ -54,11 +64,14 @@ export default function ConnectionTable({
         enableSorting: false,
         Cell: ({ row }: any) => {
           const route = row.original as RouteModel;
+          const connection = connections.find((conn) =>
+            conn.routes.includes(route)
+          );
           return (
             <Button
               variant="contained"
               color="primary"
-              onClick={() => handleBook(route)}
+              onClick={() => handleBook(route, connection)}
             >
               Book
             </Button>
@@ -128,16 +141,10 @@ export default function ConnectionTable({
         },
       },
     ],
-    []
+    [connections, handleBook]
   );
 
-  function handleBook(route: RouteModel) {
-    setSelectedConnection(
-      connections.find((conn) => conn.routes.includes(route))
-    ); // works here because all routes are shown in at most one (direct) connection
-    setSelectedRouteId(route.routeId);
-    setIsBookingDialogOpen(true);
-  }
+ 
 
   const table = useMaterialReactTable({
     columns,

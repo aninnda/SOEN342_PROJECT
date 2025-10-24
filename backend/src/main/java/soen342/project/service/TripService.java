@@ -37,16 +37,18 @@ public class TripService {
      * Creates a new trip and generates a trip reference id
      */
     @Transactional
-    public Map<String, Object> createTrip(Trip trip) {
+    public Map<String, Object> createTrip(Trip tripRequest) {
+        Trip trip = new Trip(tripRequest.getTravelers(), tripRequest.getRouteIds(), tripRequest.getInitialDepartureDate());
 
         createOrUpdateTravelers(trip.getTravelers());
-        createTicketsForTrip(trip);
 
         Trip saved = tripRepository.save(trip);
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Trip created successfully");
         response.put("trip", saved);
-        response.put("tripReference", saved.getId());
+
+        createTicketsForTrip(saved);
+
         return response;
     }
 

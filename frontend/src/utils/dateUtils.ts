@@ -1,6 +1,6 @@
 import type { DayOfWeek } from "../models/models";
 
-function toIndex(day: String): number {
+export function toIndex(day: String): number {
   switch (day) {
     case "MONDAY":
       return 0;

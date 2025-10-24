@@ -1,13 +1,25 @@
-import { Box, Button, Modal, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import type {
   ConnectionModel,
   TravelerModel,
   TripModel,
 } from "../models/models";
-import { createTrip } from "../queries/tripQueries";
-import dayjs, { Dayjs } from "dayjs";
-import { DateTimeField } from "@mui/x-date-pickers";
+import { useCreateTrip } from "../queries/tripQueries";
+import { toIndex } from "../utils/dateUtils";
+import { formatRouteNameList } from "../utils/stringFormatUtils";
 
 type BookingDialogProps = {
   open: boolean;
@@ -22,12 +34,16 @@ export default function BookingModal({
   routeIds,
   connection,
 }: BookingDialogProps) {
+  const createTripMutation = useCreateTrip();
+
   const [numTravelers, setNumTravelers] = useState(1);
-  const [travelers, setTravelers] = useState<TravelerModel[]>([]);
+  const [travelers, setTravelers] = useState<TravelerModel[]>([
+    { id: "", firstName: "", lastName: "", age: "" },
+  ]);
   const [loading, setLoading] = useState(false);
-  const [departureDateTime, setDepartureDateTime] = useState<Dayjs>(
-    dayjs().startOf("day")
-  );
+  const [departureDate, setDepartureDate] = useState<Dayjs>();
+
+  const [tripId, setTripId] = useState<string | null>(null);
 
   // Update travelers array when numTravelers changes
   const handleNumTravelersChange = (n: number) => {
@@ -35,7 +51,7 @@ export default function BookingModal({
     setTravelers((prev) => {
       const arr = [...prev];
       while (arr.length < n)
-        arr.push({ id: "", firstName: "", lastName: "", age: 0 });
+        arr.push({ id: "", firstName: "", lastName: "", age: "" });
       while (arr.length > n) arr.pop();
       return arr;
     });
@@ -54,20 +70,22 @@ export default function BookingModal({
   };
 
   const handleSubmit = async () => {
-    if (travelers.some((t) => !t.firstName || !t.age || !t.id)) {
+    if (travelers.some((t) => !t.firstName || t.age === "" || !t.id)) {
       alert("Please fill all fields for all travelers");
       return;
     }
 
     const payload: TripModel = {
-      id: 0, // is assigned by the backend
+      id: -1, // is assigned by the backend
       travelers: travelers,
       routeIds,
-      initialDepartureDateTime: departureDateTime,
+      initialDepartureDate: departureDate,
     };
     setLoading(true);
     try {
-      const res = await createTrip(payload);
+      const data = await createTripMutation.mutateAsync(payload);
+      setTripId(data.trip.id.toString());
+      onClose();
     } catch (err: any) {
       console.error("Booking error:", err);
       if (err instanceof Error) {
@@ -79,7 +97,6 @@ export default function BookingModal({
       setLoading(false);
     }
   };
-
   return (
     <>
       <Modal open={open} onClose={onClose}>
@@ -97,14 +114,21 @@ export default function BookingModal({
             overflowY: "auto",
           }}
         >
-          <DateTimeField
-            value={departureDateTime}
-            onChange={(value) => setDepartureDateTime(value as Dayjs)}
-          />
-
           <Typography variant="h6" mb={2}>
-            Book Route(s): {routeIds.join(", ")}
+            Book Connection: {formatRouteNameList(connection?.routes || [])}
           </Typography>
+
+          <DatePicker
+            label="Departure Date"
+            sx={{ width: "100%", mb: 2 }}
+            value={departureDate}
+            onChange={(value) => setDepartureDate(value as Dayjs)}
+            shouldDisableDate={(day) =>
+              connection?.routes[0].daysOfOperation
+                .map(toIndex)
+                .includes(day.day()) === false
+            }
+          />
           <TextField
             fullWidth
             type="number"
@@ -119,7 +143,7 @@ export default function BookingModal({
           {travelers.map((t, idx) => (
             <Box key={idx} mb={2}>
               <Typography variant="subtitle1">Traveler {idx + 1}</Typography>
-              <Box sx={{ mb: 1 }}>
+              <Box sx={{ mb: 1, display: "flex", gap: 1 }}>
                 <TextField
                   fullWidth
                   label="First name"
@@ -138,30 +162,30 @@ export default function BookingModal({
                   }
                 />
               </Box>
-              <TextField
-                fullWidth
-                label="Age"
-                type="number"
-                value={t.age}
-                onChange={(e) =>
-                  handleTravelerChange(
-                    idx,
-                    "age",
-                    e.target.value === "" ? "" : Number(e.target.value)
-                  )
-                }
-                sx={{ mb: 1 }}
-                inputProps={{ min: 0 }}
-              />
-              <TextField
-                fullWidth
-                label="ID (letters & numbers)"
-                value={t.id}
-                onChange={(e) =>
-                  handleTravelerChange(idx, "id", e.target.value)
-                }
-                sx={{ mb: 1 }}
-              />
+              <Box sx={{ mb: 1, display: "flex", gap: 1 }}>
+                <TextField
+                  fullWidth
+                  label="Age"
+                  type="number"
+                  value={t.age}
+                  onChange={(e) =>
+                    handleTravelerChange(
+                      idx,
+                      "age",
+                      e.target.value === "" ? "" : Number(e.target.value)
+                    )
+                  }
+                  inputProps={{ min: 0 }}
+                />
+                <TextField
+                  fullWidth
+                  label="ID (letters & numbers)"
+                  value={t.id}
+                  onChange={(e) =>
+                    handleTravelerChange(idx, "id", e.target.value)
+                  }
+                />
+              </Box>
             </Box>
           ))}
           <Box display="flex" gap={2} justifyContent="flex-end">
@@ -179,25 +203,25 @@ export default function BookingModal({
         </Box>
       </Modal>
 
-      {/* {tripReference && (
+      {tripId && (
         <Dialog
           open={true}
           onClose={() => {
-            setTripReference(null);
+            setTripId(null);
             onClose();
           }}
         >
-          <DialogTitle>Trip Complete</DialogTitle>
+          <DialogTitle>Trip Created Successfully</DialogTitle>
           <DialogContent>
-            <Typography gutterBottom>Your trip reference number:</Typography>
+            <Typography gutterBottom>Your trip ID:</Typography>
             <Typography variant="h6" color="primary">
-              {tripReference}
+              {tripId}
             </Typography>
           </DialogContent>
           <DialogActions>
             <Button
               onClick={() => {
-                setTripReference(null);
+                setTripId(null);
                 onClose();
               }}
               variant="contained"
@@ -206,7 +230,7 @@ export default function BookingModal({
             </Button>
           </DialogActions>
         </Dialog>
-      )} */}
+      )}
     </>
   );
 }

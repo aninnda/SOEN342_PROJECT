@@ -86,7 +86,7 @@ export default function IndirectConnectionTable(
         Cell: () => {
           return null; // only display book button in aggregated cell
         },
-        size: 105, 
+        size: 105,
       },
       {
         header: "Connection",
@@ -105,10 +105,8 @@ export default function IndirectConnectionTable(
 
           const cities = new Set<string>(routes.map((r) => r.departureCity));
 
-          if (routes.length > 0) {
-            if (routes.length > 1) {
-              cities.add(routes[routes.length - 1].arrivalCity);
-            }
+          if (routes.length > 1) {
+            cities.add(routes[routes.length - 1].arrivalCity);
           }
 
           return Array.from(cities).join(" - ");

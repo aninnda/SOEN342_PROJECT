@@ -60,14 +60,14 @@ export type TravelerModel = {
   id: string;
   firstName: string;
   lastName: string;
-  age: number;
+  age: number | "";
 };
 
 export type TripModel = {
   id: number;
   travelers: TravelerModel[];
   routeIds: string[];
-  initialDepartureDateTime: Dayjs;
+  initialDepartureDate: Dayjs | undefined;
 };
 
 export type RouteDetails = {
@@ -88,4 +88,9 @@ export type TicketModel = {
   traveler: TravelerModel;
   trip: TripModel;
   issuedAt: Dayjs;
+};
+
+export type TripCreationResponse = {
+  message: string;
+  trip: TripModel;
 };

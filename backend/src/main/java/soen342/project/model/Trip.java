@@ -35,22 +35,22 @@ public class Trip {
     @Column(name = "route_id")
     private List<String> routeIds;
 
-    private LocalDateTime initialDepartureDateTime;
+    private LocalDateTime initialDepartureDate;
 
     public Trip() {
     }
 
-    public Trip(List<Traveler> travelers, List<String> routeIds, LocalDateTime initialDepartureDateTime) {
+    public Trip(List<Traveler> travelers, List<String> routeIds, LocalDateTime initialDepartureDate) {
         this.travelers = travelers;
         this.routeIds = routeIds;
-        this.initialDepartureDateTime = initialDepartureDateTime;
+        this.initialDepartureDate = initialDepartureDate;
     }
 
     public Trip(Trip trip) {
         this.id = trip.id;
         this.travelers = trip.travelers;
         this.routeIds = trip.routeIds;
-        this.initialDepartureDateTime = trip.initialDepartureDateTime;
+        this.initialDepartureDate = trip.initialDepartureDate;
     }
 
     public Long getId() {
@@ -61,8 +61,8 @@ public class Trip {
         return travelers;
     }
 
-    public LocalDateTime getInitialDepartureDateTime() {
-        return initialDepartureDateTime;
+    public LocalDateTime getInitialDepartureDate() {
+        return initialDepartureDate;
     }
 
     public void setTravelers(List<Traveler> travelers) {
