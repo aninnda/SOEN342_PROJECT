@@ -93,7 +93,7 @@ export default function BookingModal({
     try {
       const data = await createTripMutation.mutateAsync(payload);
       setTripId(data.trip.id.toString());
-      onClose();
+      resetAndClose();
     } catch (err: any) {
       console.error("Booking error:", err);
       if (err instanceof Error) {
@@ -197,7 +197,7 @@ export default function BookingModal({
             </Box>
           ))}
           <Box display="flex" gap={2} justifyContent="flex-end">
-            <Button onClick={onClose} disabled={loading}>
+            <Button onClick={resetAndClose} disabled={loading}>
               Cancel
             </Button>
             <Button
@@ -216,7 +216,7 @@ export default function BookingModal({
           open={true}
           onClose={() => {
             setTripId(null);
-            onClose();
+            resetAndClose();
           }}
         >
           <DialogTitle>Trip Created Successfully</DialogTitle>
