@@ -45,6 +45,14 @@ export default function BookingModal({
 
   const [tripId, setTripId] = useState<string | null>(null);
 
+  function resetAndClose() {
+    setNumTravelers(1);
+    setTravelers([{ id: "", firstName: "", lastName: "", age: "" }]);
+    setDepartureDate(undefined);
+    setLoading(false);
+    onClose();
+  }
+
   // Update travelers array when numTravelers changes
   const handleNumTravelersChange = (n: number) => {
     setNumTravelers(n);
@@ -99,7 +107,7 @@ export default function BookingModal({
   };
   return (
     <>
-      <Modal open={open} onClose={onClose}>
+      <Modal open={open} onClose={resetAndClose}>
         <Box
           sx={{
             position: "absolute",
@@ -225,7 +233,7 @@ export default function BookingModal({
             <Button
               onClick={() => {
                 setTripId(null);
-                onClose();
+                resetAndClose();
               }}
               variant="contained"
             >
