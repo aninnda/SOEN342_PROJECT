@@ -78,7 +78,7 @@ export default function BookingModal({
   };
 
   const handleSubmit = async () => {
-    if (travelers.some((t) => !t.firstName || t.age === "" || !t.id)) {
+    if (travelers.some((t) => !t.firstName || t.age === "" || !t.id) || !departureDate) {
       alert("Please fill all fields for all travelers");
       return;
     }
