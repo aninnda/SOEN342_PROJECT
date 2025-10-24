@@ -1,24 +1,22 @@
 package soen342.project.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import soen342.project.model.Trip;
-import soen342.project.service.TripService;
-
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import soen342.project.DTOs.DetailedTrip;
 import soen342.project.model.Ticket;
+import soen342.project.model.Trip;
+import soen342.project.service.TripService;
 
 @RestController
 @CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173" })
@@ -46,8 +44,8 @@ public class TripController {
     @GetMapping("/trips/searchByTravelerId")
     public ResponseEntity<List<DetailedTrip>> searchTrips(
             @RequestParam(value = "travelerId") String travelerId,
-            @RequestParam(value = "name", required = false) String name) {
-        List<DetailedTrip> trips = tripService.searchTrips(travelerId, name);
+            @RequestParam(value = "lastName") String lastName) {
+        List<DetailedTrip> trips = tripService.searchTrips(travelerId, lastName);
         return ResponseEntity.ok(trips);
     }
 

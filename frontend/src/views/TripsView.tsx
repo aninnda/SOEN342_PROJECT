@@ -1,38 +1,30 @@
-import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import { Box, Button, Grid, Paper, TextField } from "@mui/material";
 import { useMemo, useState } from "react";
 import { TripResults } from "../components/trips/TripResults";
-import {
-  useGetTripsByTravelerId,
-  useGetTripsByTripReference,
-} from "../queries/tripQueries";
+import { useGetTripsByTravelerId } from "../queries/tripQueries";
 
 export default function TripsView() {
   const [identifier, setIdentifier] = useState<string>("");
   const [name, setName] = useState<string>("");
-  const [tripReference, setTripReference] = useState<string>("");
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
   const [showPlaceholder, setShowPlaceholder] = useState<boolean>(true);
 
-  const byIdentifierQuery = useGetTripsByTravelerId(identifier, name);
-
-  const byReferenceQuery = useGetTripsByTripReference(tripReference);
-
-  const currentQuery = tripReference ? byReferenceQuery : byIdentifierQuery;
+  const tripsQuery = useGetTripsByTravelerId(identifier, name);
 
   const data = useMemo(() => {
-    return currentQuery.data;
-  }, [currentQuery.data]);
+    return tripsQuery.data;
+  }, [tripsQuery.data]);
 
   const isLoading =
-    isSearching && (currentQuery.isLoading || currentQuery.isFetching);
+    isSearching && (tripsQuery.isLoading || tripsQuery.isFetching);
 
   const handleSearch = () => {
     setIsSearching(true);
     setShowPlaceholder(false);
-    currentQuery.refetch().finally(() => {
+    tripsQuery.refetch().finally(() => {
       setIsSearching(false);
     });
   };
@@ -64,22 +56,18 @@ export default function TripsView() {
           }}
         >
           <TextField
+            required
             label="Traveler ID"
             fullWidth
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
           />
           <TextField
-            label="Last name (optional)"
+            required
+            label="Last name"
             fullWidth
             value={name}
             onChange={(e) => setName(e.target.value)}
-          />
-          <TextField
-            label="Trip Reference Number (optional)"
-            fullWidth
-            value={tripReference}
-            onChange={(e) => setTripReference(e.target.value)}
           />
           <Button type="submit" variant="contained" startIcon={<SearchIcon />}>
             Search
@@ -94,7 +82,11 @@ export default function TripsView() {
               information.
             </Box>
           ) : (
-            <TripResults results={data} isLoading={isLoading} />
+            <TripResults
+              results={data}
+              isLoading={isLoading}
+              travelerId={identifier}
+            />
           )}
         </Paper>
       </Grid>

@@ -4,18 +4,41 @@ import {
   List,
   ListItem,
   ListItemText,
+  Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
-import { type TripResult } from "../../queries/tripQueries";
-import { formatDuration } from "../../utils/dateUtils";
+import type { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { useState } from "react";
+import type { DetailedTripModel } from "../../models/models";
+import { formatDuration } from "../../utils/dateUtils";
+import SingleTripResult from "./SingleTripResult";
 
 type Props = {
-  results: TripResult[] | undefined;
+  travelerId?: string;
+  results: DetailedTripModel[] | undefined;
   isLoading?: boolean;
 };
 
 export function TripResults(props: Props) {
+  const pastResults = props.results?.filter((trip) => {
+    const departureDate = dayjs(trip.initialDepartureDate);
+    return departureDate.isBefore(dayjs().startOf("day"), "day");
+  });
+  const futureResults = props.results?.filter((trip) => {
+    const departureDate = dayjs(trip.initialDepartureDate);
+    return (
+      departureDate.isAfter(dayjs().startOf("day")) ||
+      departureDate.isSame(dayjs(), "day")
+    );
+  }).sort((a, b) => {
+    const dateA = dayjs(a.initialDepartureDate);
+    const dateB = dayjs(b.initialDepartureDate);
+    return dateA.diff(dateB);
+  });
+
+  const [selectedTab, setSelectedTab] = useState<number>(0);
 
   return (
     <Box sx={{ p: 1, minHeight: 260 }}>
@@ -24,46 +47,39 @@ export function TripResults(props: Props) {
       ) : (
         !props.results?.length && <Typography>No trips found.</Typography>
       )}
-      <List>
-        {props.results?.map((item) => (
-          <ListItem key={item.ticketId} alignItems="flex-start">
-            <ListItemText
-              primary={
-                <>
-                  <strong>Ticket ID:</strong> {item.ticketId}
-                  <br />
-                  <strong>Name:</strong> {item.travelerName}
-                  <br />
-                  <strong>Identifier:</strong> {item.travelerIdentifier}
-                  <br />
-                  <strong>Trip Reference:</strong> {item.tripReference}
-                </>
-              }
-              secondary={
-                <>
-                  {item.routes.map((route, idx) => (
-                    <span
-                      key={route.routeId}
-                      style={{ display: "block", marginBottom: 8 }}
-                    >
-                      <strong>Route {idx + 1}</strong>
-                      <br />
-                      <strong>Cities:</strong> {route.departureCity} →{" "}
-                      {route.arrivalCity}
-                      <br />
-                      <strong>Departure:</strong> {route.departureTime} &nbsp;{" "}
-                      <strong>Arrival:</strong> {route.arrivalTime}
-                      <br />
-                      <strong>Duration:</strong>{" "}
-                      {formatDuration(route.tripDuration)}
-                    </span>
-                  ))}
-                </>
-              }
-            />
-          </ListItem>
-        ))}
-      </List>
+
+      {!!props.results?.length && (
+        <Box>
+          <Tabs
+            value={selectedTab}
+            onChange={(_, newValue) => setSelectedTab(newValue)}
+          >
+            {!!futureResults?.length && <Tab label="Upcoming" />}
+            {!!pastResults?.length && <Tab label="Past" />}
+          </Tabs>
+          <div role="tabpanel" hidden={selectedTab !== 0} id={"tabpanel-0"}>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              Upcoming Trips
+            </Typography>
+            <List>
+              {futureResults?.map((item) => (
+                <SingleTripResult key={item.id} trip={item} />
+              ))}
+            </List>
+          </div>
+
+          <div role="tabpanel" hidden={selectedTab !== 1} id={"tabpanel-1"}>
+            <Typography variant="h6" sx={{ mt: 2 }}>
+              Past Trips
+            </Typography>
+            <List>
+              {pastResults?.map((item) => (
+                <SingleTripResult key={item.id} trip={item} />
+              ))}
+            </List>
+          </div>
+        </Box>
+      )}
     </Box>
   );
 }

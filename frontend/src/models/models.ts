@@ -67,7 +67,7 @@ export type TripModel = {
   id: number;
   travelers: TravelerModel[];
   routeIds: string[];
-  initialDepartureDate: Dayjs | undefined;
+  initialDepartureDate: Dayjs | string | undefined;
 };
 
 export type RouteDetails = {

@@ -94,12 +94,15 @@ public class TripService {
      */
     public List<DetailedTrip> searchTrips(String travelerId, String name) {
         List<Trip> trips;
-        if (name == null || name.isBlank()) {
-            trips = tripRepository.findByTravelers_Id(travelerId);
-        } else {
-            trips = tripRepository.findByTravelers_IdAndTravelers_LastNameContainingIgnoreCase(travelerId,
-                    name);
-        }
+        trips = tripRepository.findByTravelers_Id(travelerId).stream()
+                .filter(trip -> {
+                    if (name == null || name.isEmpty()) {
+                        return true;
+                    }
+                    return trip.getTravelers().stream()
+                            .anyMatch(traveler -> traveler.getLastName().equalsIgnoreCase(name));
+                })
+                .collect(Collectors.toList());
         return constructDetailedTrips(trips);
     }
 

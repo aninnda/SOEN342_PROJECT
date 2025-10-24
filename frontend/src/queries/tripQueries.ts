@@ -1,4 +1,9 @@
-import type { DetailedTripModel, TripCreationResponse, TripModel } from "../models/models";
+import type {
+  DetailedTripModel,
+  TicketModel,
+  TripCreationResponse,
+  TripModel,
+} from "../models/models";
 import api from "./api";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -51,10 +56,13 @@ export const useGetAllTrips = () => {
 };
 
 // useQuery versions
-export const useGetTripsByTravelerId = (identifier: string, name?: string) => {
+export const useGetTripsByTravelerId = (
+  identifier: string,
+  lastName: string
+) => {
   const url = `/trips/searchByTravelerId?travelerId=${encodeURIComponent(
     identifier
-  )}${name ? `&name=${encodeURIComponent(name)}` : ""}`;
+  )}&lastName=${encodeURIComponent(lastName)}`;
 
   const query = useQuery({
     queryKey: ["get", "trips", "byIdentifier", identifier],
@@ -64,14 +72,22 @@ export const useGetTripsByTravelerId = (identifier: string, name?: string) => {
   return query;
 };
 
-export const useGetTripsByTripReference = (tripReference: string) => {
-  const url = `/trips/searchById?tripReference=${encodeURIComponent(
-    tripReference
-  )}`;
+export const useGetTripsByTripReference = (tripId: number) => {
+  const url = `/trips/searchById?tripReference=${encodeURIComponent(tripId)}`;
   const query = useQuery({
-    queryKey: ["get", "trips", "byTripReference", tripReference],
+    queryKey: ["get", "trips", "byTripReference", tripId],
     queryFn: () => api.url(url).get().json<DetailedTripModel[]>(),
     enabled: false, // disables automatic fetching, must be called via .refetch();
+  });
+  return query;
+};
+
+export const useGetTicketsByTripId = (tripId: number) => {
+  const url = `/tickets/search?tripId=${encodeURIComponent(tripId)}`;
+  const query = useQuery({
+    queryKey: ["get", "tickets", "byTripId", tripId],
+    queryFn: () => api.url(url).get().json<TicketModel[]>(),
+    enabled: false,
   });
   return query;
 };

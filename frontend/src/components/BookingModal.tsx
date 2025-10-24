@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import dayjs, { Dayjs } from "dayjs";
+import { Dayjs } from "dayjs";
 import { useState } from "react";
 import type {
   ConnectionModel,
@@ -219,6 +219,9 @@ export default function BookingModal({
             </Typography>
           </DialogContent>
           <DialogActions>
+            <Button href="/trips" target="_blank" variant="text">
+              View Trips
+            </Button>
             <Button
               onClick={() => {
                 setTripId(null);
