@@ -14,7 +14,12 @@ import soen342.project.util.DateTimeUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Database {
+/**
+ * This class simulates a repository for Route data.
+ * It currently reads route information from a CSV file and provides methods to access routes.
+ * This is why it's not an interface extending JpaRepository like TripRepository.
+ */
+public class RouteRepository {
 
     // TODO use an actual database
     private static final String ROUTES_CSV_FILE = "src/main/resources/static/eu_rail_network.csv";
@@ -23,16 +28,16 @@ public class Database {
     private HashMap<String, List<Route>> routesByDepartureCity;
     private HashMap<String, List<Route>> routesByArrivalCity;
 
-    private static Database instance;
+    private static RouteRepository instance;
 
-    private Database() {
+    private RouteRepository() {
         // private constructor to prevent instantiation from outside as it's a singleton
 
     }
 
-    public static synchronized Database getInstance() {
+    public static synchronized RouteRepository getInstance() {
         if (instance == null) {
-            instance = new Database();
+            instance = new RouteRepository();
             instance.readRoutesFromCSV(ROUTES_CSV_FILE);
             instance.loadRoutesByDepartureCity();
             instance.loadRoutesByArrivalCity();

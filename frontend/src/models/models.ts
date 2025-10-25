@@ -10,8 +10,7 @@ const DayOfWeek = {
   SUNDAY: "Sunday",
 } as const;
 
-export type DayOfWeek = typeof DayOfWeek[keyof typeof DayOfWeek];
-
+export type DayOfWeek = (typeof DayOfWeek)[keyof typeof DayOfWeek];
 
 export type RouteModel = {
   routeId: string;
@@ -24,7 +23,7 @@ export type RouteModel = {
   firstClassTicketRate: number; // in euro
   secondClassTicketRate: number; // in euro
   tripDuration?: number; // format is hh:mm
-}
+};
 
 export type ConnectionModel = {
   routes: RouteModel[];
@@ -37,7 +36,6 @@ export type ConnectionModel = {
   layovers?: LayoverModel[];
 };
 
-
 export type LayoverModel = {
   startRoute: RouteModel;
   endRoute: RouteModel;
@@ -45,8 +43,7 @@ export type LayoverModel = {
   firstRouteEndDay: DayOfWeek;
   secondRouteStartDay: DayOfWeek;
   layoverDuration: number; // in hours
-}
-
+};
 
 export type SearchFilters = {
   departureCity?: string;
@@ -57,4 +54,43 @@ export type SearchFilters = {
   maxFirstClassPrice?: number;
   maxSecondClassPrice?: number;
   dayOfWeek?: DayOfWeek | null;
-}
+};
+
+export type TravelerModel = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  age: number | "";
+};
+
+export type TripModel = {
+  id: number;
+  travelers: TravelerModel[];
+  routeIds: string[];
+  initialDepartureDate: Dayjs | string | undefined;
+};
+
+export type RouteDetails = {
+  routeId: string;
+  departureCity: string;
+  arrivalCity: string;
+  departureTime: string;
+  arrivalTime: string;
+  tripDuration: number;
+};
+
+export type DetailedTripModel = TripModel & {
+  routes: RouteDetails[];
+};
+
+export type TicketModel = {
+  id: number;
+  traveler: TravelerModel;
+  trip: TripModel;
+  issuedAt: Dayjs;
+};
+
+export type TripCreationResponse = {
+  message: string;
+  trip: TripModel;
+};

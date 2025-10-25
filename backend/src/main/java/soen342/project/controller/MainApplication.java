@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import soen342.project.data.Database;
+import soen342.project.data.RouteRepository;
 import soen342.project.model.Requests.SearchCriteria;
 import soen342.project.model.Responses.SearchResponseModel;
 import soen342.project.service.SearchService;
@@ -90,7 +90,7 @@ public class MainApplication {
 
 	@GetMapping("/debug/routes-count")
 	public String getRoutesCount() {
-		return "Loaded routes: " + Database.getInstance().getRoutes().size();
+		return "Loaded routes: " + RouteRepository.getInstance().getRoutes().size();
 	}
 
 }
