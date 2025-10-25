@@ -1,0 +1,8 @@
+@startuml
+
+User -> System: searchTrips(travelerId, lastName)
+System --> User: trips (displayed)
+User -> System: viewDetails(tripId)
+System --> User: details and tickets
+
+@enduml

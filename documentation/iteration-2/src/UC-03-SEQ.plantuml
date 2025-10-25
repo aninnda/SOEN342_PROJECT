@@ -1,0 +1,13 @@
+@startuml
+
+participant TripService
+participant TripRepository
+collections Trips
+
+--> TripService: searchTrips(travelerId, lastName)
+TripService -> TripRepository: findByTravelers_Id(travelerId)
+TripRepository -> Trips: trips:=findByTravelers_Id(travelerId)
+Trips --> TripService: trips
+<-- TripService: filteredTrips = trips.filterByLastName(lastName)
+
+@enduml

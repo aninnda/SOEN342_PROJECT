@@ -1,0 +1,41 @@
+@startuml
+
+participant TripService
+participant TravelerRepository
+collections Travelers
+participant Traveler
+participant TripRepository
+participant Trip
+collections Trips
+participant TicketRepository
+participant Ticket
+collections Tickets
+
+
+-> TripService: createTrip(tripInfo)
+loop traveler count
+TripService -> TravelerRepository: createOrUpdateTravelers(travelerInfo)
+TravelerRepository -> Travelers: traveler := findTraveler(id)
+alt traveler found
+TravelerRepository -> Travelers: update(traveler)
+
+else
+TravelerRepository -> Traveler **: traveler := create(travelerInfo)
+TravelerRepository -> Travelers: add(traveler)
+end
+end
+
+TripService -> TripRepository: create(tripInfo)
+TripRepository -> Trip **: trip := create(tripInfo)
+TripRepository -> Trips: add(trip)
+
+loop traveler count
+TripService -> TicketRepository: createTicket(ticketInfo)
+TicketRepository -> Ticket **: ticket := createTicket(ticketInfo)
+TicketRepository -> Tickets: add(ticket)
+
+end
+
+<-- TripService: trip.id
+
+@enduml
