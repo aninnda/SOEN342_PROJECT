@@ -1,0 +1,16 @@
+@startuml
+
+User -> System: initiateBooking(connection)
+System --> User: booking form
+User -> System: enterNumberOfTravelers(n)
+
+loop n times
+User -> System: addTraveler(travelerInfo)
+end
+
+User -> System: enterDepartureDate(date)
+User -> System: createTrip(tripInfo)
+
+System --> User: created trip's ID
+
+@enduml

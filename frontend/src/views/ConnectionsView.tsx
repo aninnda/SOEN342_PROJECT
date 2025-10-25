@@ -1,13 +1,13 @@
-import { useState } from "react";
 import { Box, Typography } from "@mui/material";
-import ConnectionTable from "../components/tables/ConnectionTable";
+import { useState } from "react";
 import SearchInterface from "../components/searchFilters/SearchInterface";
+import ConnectionTable from "../components/tables/ConnectionTable";
 import type { SearchFilters } from "../models/models";
 
 /**
  * Main view that combines search interface with results table
  */
-export default function IndexView() {
+export default function ConnectionsView() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [hasSearched, setHasSearched] = useState(false);
 
@@ -22,7 +22,15 @@ export default function IndexView() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box
+      sx={{
+        p: 3,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       {!hasSearched && (
         <Typography variant="h3" align="center" gutterBottom>
           Choose your next travel destination!

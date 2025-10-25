@@ -1,9 +1,12 @@
+import InfoIcon from "@mui/icons-material/Info";
+import { Alert, Box, Button, Tooltip } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
   type MRT_Row,
 } from "material-react-table";
+import { useMemo, useState } from "react";
 import type {
   ConnectionModel,
   LayoverModel,
@@ -13,9 +16,7 @@ import {
   formatDuration,
   getDisplayNameForDaysOfOperation,
 } from "../../utils/dateUtils";
-import { useMemo } from "react";
-import { Alert, Box, Tooltip, Typography } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
+import BookingModal from "../BookingModal";
 
 type IndirectConnectionTableProps = {
   data: ConnectionModel[];
@@ -30,6 +31,8 @@ type ExtendedRouteModel = RouteModel & {
 export default function IndirectConnectionTable(
   props: IndirectConnectionTableProps
 ) {
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [selectedRouteIds, setSelectedRouteIds] = useState<string[]>([]);
   const extendedRoutes = useMemo<ExtendedRouteModel[]>(() => {
     const routes: ExtendedRouteModel[] = [];
 
@@ -53,6 +56,39 @@ export default function IndirectConnectionTable(
   const columns = useMemo<MRT_ColumnDef<ExtendedRouteModel>[]>(
     () => [
       {
+        header: "",
+        accessorKey: "routeId",
+        enableSorting: false,
+        enableGrouping: false,
+        AggregatedCell: ({ row }: any) => {
+          const route = row.original as ExtendedRouteModel;
+          // Find the full connection for this route
+          const connection = props.data.find(
+            (conn) =>
+              route.connectionId === conn.routes.map((r) => r.routeId).join("-")
+          );
+          const routeIds = connection
+            ? connection.routes.map((r) => r.routeId)
+            : [route.routeId];
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                setSelectedRouteIds(routeIds);
+                setIsBookingDialogOpen(true);
+              }}
+            >
+              Book
+            </Button>
+          );
+        },
+        Cell: () => {
+          return null; // only display book button in aggregated cell
+        },
+        size: 105,
+      },
+      {
         header: "Connection",
         accessorKey: "connectionId",
         enableSorting: false,
@@ -60,18 +96,17 @@ export default function IndirectConnectionTable(
         GroupedCell: ({ row }) => {
           const connectionId = row.original.connectionId;
 
-          const routes = props.data.find(
-            (conn) =>
-              connectionId ===
-              conn.routes.map((route) => route.routeId).join("-")
-          )?.routes;
+          const routes =
+            props.data.find(
+              (conn) =>
+                connectionId ===
+                conn.routes.map((route) => route.routeId).join("-")
+            )?.routes ?? [];
 
-          const cities = new Set<string>(routes?.map((r) => r.departureCity));
+          const cities = new Set<string>(routes.map((r) => r.departureCity));
 
-          if (!!routes?.length) {
-            if (routes?.length > 1) {
-              cities.add(routes[routes?.length - 1].arrivalCity);
-            }
+          if (routes.length > 1) {
+            cities.add(routes[routes.length - 1].arrivalCity);
           }
 
           return Array.from(cities).join(" - ");
@@ -162,7 +197,7 @@ export default function IndirectConnectionTable(
         ),
         Cell: ({ row }: { row: MRT_Row<ExtendedRouteModel> }) => {
           const tooltipText = row.original.layovers
-            ?.map((layover, index) => {
+            ?.map((layover: LayoverModel, index: number) => {
               return `Layover ${index + 1}: Depart ${
                 layover.startRoute.departureCity
               } (${layover.startRoute.departureTime}, ${
@@ -215,14 +250,18 @@ export default function IndirectConnectionTable(
     // grouping for connections
     enableGrouping: true,
     groupedColumnMode: false,
-    initialState: { grouping: ["connectionId"], expanded: true },
+    initialState: { grouping: ["connectionId"], expanded: true } as any,
     paginateExpandedRows: false,
 
     // styling
     displayColumnDefOptions: {
       "mrt-row-expand": {
-        muiTableBodyCellProps: ({ row }) => ({
-          sx: (theme) => ({
+        muiTableBodyCellProps: ({
+          row,
+        }: {
+          row: MRT_Row<ExtendedRouteModel>;
+        }) => ({
+          sx: (theme: any) => ({
             backgroundColor: row.getIsGrouped()
               ? theme.palette.primary.dark
               : "",
@@ -236,12 +275,17 @@ export default function IndirectConnectionTable(
   return (
     <>
       <Box>
-        <Alert severity="info" variant="outlined" sx={{my: 2}}>
+        <Alert severity="info" variant="outlined" sx={{ my: 2 }}>
           No direct connections were found. Displaying indirect connections
           instead.
         </Alert>
       </Box>
-      <MaterialReactTable table={table} />;
+      <MaterialReactTable table={table as any} />
+      <BookingModal
+        open={isBookingDialogOpen}
+        onClose={() => setIsBookingDialogOpen(false)}
+        routeIds={selectedRouteIds}
+      />
     </>
   );
 }

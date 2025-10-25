@@ -4,17 +4,23 @@ import java.util.List;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import soen342.project.data.Database;
+import soen342.project.data.RouteRepository;
 import soen342.project.model.Requests.SearchCriteria;
 import soen342.project.model.Responses.SearchResponseModel;
 import soen342.project.service.SearchService;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "soen342.project")
+@EntityScan(basePackages = "soen342.project.model")
+@EnableJpaRepositories(basePackages = "soen342.project.data")
 @RestController
 @CrossOrigin(origins = { "http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5176", "http://127.0.0.1:5176" })
 public class MainApplication {
@@ -84,7 +90,7 @@ public class MainApplication {
 
 	@GetMapping("/debug/routes-count")
 	public String getRoutesCount() {
-		return "Loaded routes: " + Database.getInstance().getRoutes().size();
+		return "Loaded routes: " + RouteRepository.getInstance().getRoutes().size();
 	}
 
 }

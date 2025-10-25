@@ -1,12 +1,12 @@
-import {
-  Box
-} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo } from "react";
+import { useMemo, useState, useCallback } from "react";
+import BookingModal from "../BookingModal";
+// ...existing code...
 import type {
   ConnectionModel,
   RouteModel,
@@ -26,6 +26,10 @@ interface ConnectionTableProps {
 export default function ConnectionTable({
   searchFilters = {},
 }: ConnectionTableProps) {
+  const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
+  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
+  const [selectedConnection, setSelectedConnection] =
+    useState<ConnectionModel>();
   const searchConnectionsQuery = useSearchConnections(searchFilters, true);
 
   const connections = useMemo<ConnectionModel[]>(() => {
@@ -37,13 +41,44 @@ export default function ConnectionTable({
   }, [searchConnectionsQuery]);
 
   const routes = useMemo<RouteModel[]>(() => {
-    let routeList = connections.map((conn) => conn.routes[0]);
+    const routeList = connections.map((conn) => conn.routes[0]);
 
     return routeList;
   }, [connections]);
 
+
+  /**
+   * i won't lie i don't know how useCallback works exactly
+   */
+  const handleBook = useCallback((route: RouteModel, connection: ConnectionModel | undefined) => {
+    setSelectedConnection(connection);
+    setSelectedRouteId(route.routeId);
+    setIsBookingDialogOpen(true);
+  }, [routes]);
+  
   const columns = useMemo<MRT_ColumnDef<RouteModel>[]>(
     () => [
+      {
+        header: "",
+        accessorKey: "routeId",
+        enableSorting: false,
+        Cell: ({ row }: any) => {
+          const route = row.original as RouteModel;
+          const connection = connections.find((conn) =>
+            conn.routes.includes(route)
+          );
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleBook(route, connection)}
+            >
+              Book
+            </Button>
+          );
+        },
+        size: 105,
+      },
       {
         header: "Departure City",
         accessorKey: "departureCity",
@@ -106,8 +141,10 @@ export default function ConnectionTable({
         },
       },
     ],
-    []
+    [connections, handleBook]
   );
+
+ 
 
   const table = useMaterialReactTable({
     columns,
@@ -135,9 +172,15 @@ export default function ConnectionTable({
   return (
     <>
       <Box sx={{ maxWidth: "90vw", overflowX: "auto" }}>
-        {!displayIndirectTable && <MaterialReactTable table={table} />}
+        {!displayIndirectTable && <MaterialReactTable table={table as any} />}
         {displayIndirectTable && <IndirectConnectionTable data={connections} />}
       </Box>
+      <BookingModal
+        open={isBookingDialogOpen}
+        onClose={() => setIsBookingDialogOpen(false)}
+        routeIds={selectedRouteId ? [selectedRouteId] : []}
+        connection={selectedConnection}
+      />
     </>
   );
 }

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import soen342.project.data.Database;
+import soen342.project.data.RouteRepository;
 import soen342.project.model.Connection;
 import soen342.project.model.Route;
 import soen342.project.model.Requests.SearchCriteria;
@@ -15,11 +15,17 @@ public class SearchService {
     public SearchResponseModel search(SearchCriteria criteria) {
         List<Connection> connections = new ArrayList<>();
 
+        // Debug: log search criteria
+        System.out.println("[DEBUG] Search criteria: " + criteria);
+
         // Get all routes from database
-        List<Route> allRoutes = Database.getInstance().getRoutes();
+        List<Route> allRoutes = RouteRepository.getInstance().getRoutes();
 
         // Apply filters to routes
         List<Route> filteredRoutes = filterRoutes(allRoutes, criteria);
+
+        // Debug: log number of direct connections found
+        System.out.println("[DEBUG] Direct connections found: " + filteredRoutes.size());
 
         // Convert filtered routes to connections
         for (Route route : filteredRoutes) {
@@ -34,6 +40,9 @@ public class SearchService {
                 containsIndirectConnections = true;
             }
         }
+
+        // Debug: log number of connections returned
+        System.out.println("[DEBUG] Total connections returned: " + connections.size());
 
         return new SearchResponseModel(connections, containsIndirectConnections);
     }
@@ -54,8 +63,8 @@ public class SearchService {
     private List<Connection> searchOneStops(SearchCriteria criteria) {
 
         List<Connection> oneStopConnections = new ArrayList<>();
-        List<Route> candidateStartRoutes = Database.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
-        List<Route> candidateEndRoutes = Database.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
+        List<Route> candidateStartRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = RouteRepository.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
 
         List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
                 criteria.getDepartureCity(),
@@ -95,8 +104,8 @@ public class SearchService {
     private List<Connection> searchTwoStops(SearchCriteria criteria) {
 
         List<Connection> twoStopConnections = new ArrayList<>();
-        List<Route> candidateStartRoutes = Database.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
-        List<Route> candidateEndRoutes = Database.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
+        List<Route> candidateStartRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = RouteRepository.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
 
         List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
                 criteria.getDepartureCity(),
@@ -120,7 +129,7 @@ public class SearchService {
 
         for (Route firstRoute : filteredCandidateStartRoutes) {
             for (Route lastRoute : filteredCandidateEndRoutes) {
-                List<Route> middleRoutes = Database.getInstance().getRoutesByDepartureCity(firstRoute.getArrivalCity());
+                List<Route> middleRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(firstRoute.getArrivalCity());
                 List<Route> filteredMiddleRoutes = filterRoutes(middleRoutes, new SearchCriteria(
                         null,
                         null,
@@ -257,7 +266,7 @@ public class SearchService {
         }
 
         String lowerQuery = query.toLowerCase().trim();
-        List<Route> allRoutes = Database.getInstance().getRoutes();
+        List<Route> allRoutes = RouteRepository.getInstance().getRoutes();
 
         return allRoutes.stream()
                 .map(route -> isDeparture ? route.getDepartureCity() : route.getArrivalCity())
@@ -270,7 +279,7 @@ public class SearchService {
 
     // Get all unique cities (for comprehensive autocomplete)
     public List<String> getAllCities() {
-        List<Route> allRoutes = Database.getInstance().getRoutes();
+        List<Route> allRoutes = RouteRepository.getInstance().getRoutes();
         List<String> allCities = new ArrayList<>();
 
         // Add all departure cities
@@ -293,7 +302,7 @@ public class SearchService {
 
     // Get train types for autocomplete
     public List<String> getAllTrainTypes() {
-        List<Route> allRoutes = Database.getInstance().getRoutes();
+        List<Route> allRoutes = RouteRepository.getInstance().getRoutes();
 
         return allRoutes.stream()
                 .map(Route::getTrainType)

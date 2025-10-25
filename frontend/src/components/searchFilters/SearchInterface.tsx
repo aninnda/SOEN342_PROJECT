@@ -26,6 +26,8 @@ import WrappedTimeField from "./WrappedTimeField";
 interface SearchInterfaceProps {
   onSearch: (filters: SearchFilters) => void;
   onClear: () => void;
+  // optional element to render to the right of the title (e.g., 'View Trip' button)
+  rightAction?: React.ReactNode;
 }
 
 const DAYS_OF_WEEK = [
@@ -80,23 +82,16 @@ function SearchInterface(props: SearchInterfaceProps) {
   const [filters, dispatch] = useReducer(reducer, initialFilters);
   const trainTypesQuery = useGetTrainTypes();
   const citiesQuery = useGetCities();
-  const trainTypes = useMemo(
-    () => trainTypesQuery.data || [],
-    [trainTypesQuery.isSuccess]
-  );
-  const cities = useMemo(() => citiesQuery.data || [], [citiesQuery.isSuccess]);
+  const trainTypes = useMemo(() => trainTypesQuery.data || [], [trainTypesQuery.data]);
+  const cities = useMemo(() => citiesQuery.data || [], [citiesQuery.data]);
 
   const isSearchEnabledFromFailedQuery =
     !citiesQuery.isSuccess &&
     (!!filters.arrivalCity || !!filters.departureCity);
 
   const areCityFiltersValid =
-    cities.some(
-      (city) => city.toLowerCase() === filters.departureCity?.toLowerCase()
-    ) ||
-    cities.some(
-      (city) => city.toLowerCase() === filters.arrivalCity?.toLowerCase()
-    );
+    cities.some((city: string) => city.toLowerCase() === filters.departureCity?.toLowerCase()) ||
+    cities.some((city: string) => city.toLowerCase() === filters.arrivalCity?.toLowerCase());
 
   const areDestinationAndOriginIdentical =
     filters.departureCity?.toLowerCase() === filters.arrivalCity?.toLowerCase();
@@ -116,9 +111,12 @@ function SearchInterface(props: SearchInterfaceProps) {
 
   return (
     <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-      <Typography variant="h5" gutterBottom>
-        Search Train Connections
-      </Typography>
+      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Typography variant="h5" gutterBottom>
+          Search Train Connections
+        </Typography>
+        {props.rightAction && <Box>{props.rightAction}</Box>}
+      </Box>
 
       {/* Search Filters */}
       <Grid container spacing={3} sx={{ maxWidth: "85vw" }}>

@@ -1,6 +1,7 @@
+import dayjs, { Dayjs } from "dayjs";
 import type { DayOfWeek } from "../models/models";
 
-function toIndex(day: String): number {
+export function toIndex(day: String): number {
   switch (day) {
     case "MONDAY":
       return 0;
@@ -79,4 +80,10 @@ export function formatDuration(duration: number): string {
   } else {
     return `${hours}h ${minutes}m`;
   }
+}
+
+export function formatDate(date: string | Dayjs | undefined): string {
+  if (!date) return "";
+  const formattedDate = dayjs(date);
+  return formattedDate.format("dddd, MMMM D, YYYY");
 }
