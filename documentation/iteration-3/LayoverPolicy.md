@@ -18,3 +18,12 @@ Not only is the user's preferred date-time of arrival/departure ignored, but als
 1. bring the user from point A to point B, regardless of the time they take
 2. nonetheless display the shortest layover time given all combinations of start dates/route.
 
+## Policy
+
+Returned indirect connections will contain layovers that are:
+- no longer than 2 hours long, if the layover starts between 7 pm to 5 am (exclusive).
+- no longer than 5 hours long, if the layover starts between 5 am to 7 pm (inclusive).
+
+For connections with more than a single layover, the policy must apply to both layovers for it to be suggested.
+
+Additionally, indirect connections will respect the user's start/end date-time filters.
