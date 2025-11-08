@@ -38,11 +38,12 @@ export type ConnectionModel = {
 
 export type LayoverModel = {
   startRoute: RouteModel;
+  startDepDay: DayOfWeek;
+  startArrDay: DayOfWeek;
   endRoute: RouteModel;
-  firstRouteStartDay: DayOfWeek;
-  firstRouteEndDay: DayOfWeek;
-  secondRouteStartDay: DayOfWeek;
-  layoverDuration: number; // in hours
+  endDepDay: DayOfWeek;
+  endArrDay: DayOfWeek;
+  duration: number; // in hours
 };
 
 export type SearchFilters = {

@@ -6,19 +6,21 @@ public class Layover {
 
     private Route startRoute;
     private Route endRoute;
-    private DayOfWeek firstRouteStartDay;
-    private DayOfWeek firstRouteEndDay;
-    private DayOfWeek secondRouteStartDay;
-    private double layoverDuration; // in hours
+    private DayOfWeek startDepDay;
+    private DayOfWeek startArrDay;
+    private DayOfWeek endDepDay;
+    private DayOfWeek endArrDay;
+    private double duration; // in hours
 
-    public Layover(Route startRoute, Route endRoute, DayOfWeek firstRouteStartDay, DayOfWeek firstRouteEndDay,
-            DayOfWeek secondRouteStartDay, double layoverDuration) {
+    public Layover(Route startRoute, DayOfWeek startDepDay, DayOfWeek startArrDay,
+            Route endRoute, DayOfWeek endDepDay, DayOfWeek endArrDay, double duration) {
         this.startRoute = startRoute;
+        this.startDepDay = startDepDay;
+        this.startArrDay = startArrDay;
         this.endRoute = endRoute;
-        this.firstRouteStartDay = firstRouteStartDay;
-        this.firstRouteEndDay = firstRouteEndDay;
-        this.secondRouteStartDay = secondRouteStartDay;
-        this.layoverDuration = layoverDuration;
+        this.endDepDay = endDepDay;
+        this.endArrDay = endArrDay;
+        this.duration = duration;
     }
 
     public Route getStartRoute() {
@@ -37,36 +39,44 @@ public class Layover {
         this.endRoute = endRoute;
     }
 
-    public DayOfWeek getFirstRouteStartDay() {
-        return firstRouteStartDay;
+    public DayOfWeek getStartDepDay() {
+        return startDepDay;
     }
 
-    public void setFirstRouteStartDay(DayOfWeek firstRouteStartDay) {
-        this.firstRouteStartDay = firstRouteStartDay;
+    public void setStartDepDay(DayOfWeek startDepDay) {
+        this.startDepDay = startDepDay;
     }
 
-    public DayOfWeek getFirstRouteEndDay() {
-        return firstRouteEndDay;
+    public DayOfWeek getStartArrDay() {
+        return startArrDay;
     }
 
-    public void setFirstRouteEndDay(DayOfWeek firstRouteEndDay) {
-        this.firstRouteEndDay = firstRouteEndDay;
+    public void setStartArrDay(DayOfWeek startArrDay) {
+        this.startArrDay = startArrDay;
     }
 
-    public DayOfWeek getSecondRouteStartDay() {
-        return secondRouteStartDay;
+    public DayOfWeek getEndDepDay() {
+        return endDepDay;
     }
 
-    public void setSecondRouteStartDay(DayOfWeek secondRouteStartDay) {
-        this.secondRouteStartDay = secondRouteStartDay;
+    public void setEndDepDay(DayOfWeek endDepDay) {
+        this.endDepDay = endDepDay;
     }
 
-    public double getLayoverDuration() {
-        return layoverDuration;
+    public DayOfWeek getEndArrDay() {
+        return endArrDay;
     }
 
-    public void setLayoverDuration(double layoverDuration) {
-        this.layoverDuration = layoverDuration;
+    public void setEndArrDay(DayOfWeek endArrDay) {
+        this.endArrDay = endArrDay;
+    }
+
+    public double getDuration() {
+        return duration;
+    }
+
+    public void setDuration(double duration) {
+        this.duration = duration;
     }
 
 }

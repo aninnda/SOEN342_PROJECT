@@ -18,20 +18,39 @@ public class Connection {
     private int numberOfTransfers;
 
     /**
-     * Layovers are optimized based on route days of operation and irrespective of
-     * the searched days of operation.
+     * layovers between routes in the connection
      */
     private Layover[] layovers;
 
+    /**
+     * use if no layovers
+     * @param routes
+     */
     public Connection(List<Route> routes) {
         this.routes = routes;
         this.totalMovingDuration = calculateTotalMovingDuration(routes);
-        this.connectionChangeDuration = calculateConnectionChangeDuration(routes);
+        this.connectionChangeDuration = 0;
+        this.totalTripDuration = this.totalMovingDuration + this.connectionChangeDuration;
+        this.totalFirstClassTicketRate = routes.stream().mapToInt(Route::getFirstClassTicketRate).sum();
+        this.totalSecondClassTicketRate = routes.stream().mapToInt(Route::getSecondClassTicketRate).sum();
+        this.numberOfTransfers = 0;
+        this.layovers = new Layover[0];
+    }
+
+    /**
+     * use if layovers are present
+     * @param routes
+     * @param layovers
+     */
+    public Connection(List<Route> routes, Layover[] layovers) {
+        this.routes = routes;
+        this.totalMovingDuration = calculateTotalMovingDuration(routes);
+        this.connectionChangeDuration = calculateConnectionChangeDuration(layovers);
         this.totalTripDuration = this.totalMovingDuration + this.connectionChangeDuration;
         this.totalFirstClassTicketRate = routes.stream().mapToInt(Route::getFirstClassTicketRate).sum();
         this.totalSecondClassTicketRate = routes.stream().mapToInt(Route::getSecondClassTicketRate).sum();
         this.numberOfTransfers = routes.size() - 1;
-        this.layovers = findShortestLayoverCombination(routes);
+        this.layovers = layovers;
     }
 
     private double calculateTotalMovingDuration(List<Route> routes) {
@@ -44,87 +63,14 @@ public class Connection {
      * It finds the shortest time difference based on the days and times of arrival
      * and departure.
      */
-    private double calculateConnectionChangeDuration(List<Route> routes) {
-        Layover[] bestLayovers = findShortestLayoverCombination(routes);
-        if (bestLayovers.length == 0) {
-            return 0;
-        }
+    private double calculateConnectionChangeDuration(Layover[] layovers) {
         double totalLayoverDuration = 0;
-        for (Layover layover : bestLayovers) {
-            totalLayoverDuration += layover.getLayoverDuration();
+        for (Layover layover : layovers) {
+            totalLayoverDuration += layover.getDuration();
         }
         return totalLayoverDuration;
     }
 
-    private Layover[] findShortestLayoverCombination(List<Route> routes) {
-
-        if (routes.size() < 2) {
-            return new Layover[0]; // No layovers for direct routes
-        }
-
-        Route firstRoute = routes.get(0);
-        Route secondRoute = routes.get(1);
-        Route thirdRoute = routes.size() == 3 ? routes.get(2) : null;
-
-        List<Layover[]> layoverCombinations = new ArrayList<>();
-
-        for (DayOfWeek firstRouteStartDay : firstRoute.getDaysOfOperation()) {
-
-            for (DayOfWeek secondRouteStartDay : secondRoute.getDaysOfOperation()) {
-
-                DayOfWeek firstRouteEndDay = firstRouteStartDay.plus(
-                        firstRoute.getArrivalTime().contains("(+1d)") ? 1 : 0);
-
-                double changeDuration = DateTimeUtils.calculateDateTimeDifferenceInHours(
-                        firstRouteStartDay,
-                        firstRoute.getArrivalTime(),
-                        secondRouteStartDay,
-                        secondRoute.getDepartureTime());
-
-                Layover layover = new Layover(firstRoute, secondRoute, firstRouteStartDay, firstRouteEndDay,
-                        secondRouteStartDay,
-                        changeDuration);
-
-                if (thirdRoute != null) {
-                    for (DayOfWeek thirdRouteDay : thirdRoute.getDaysOfOperation()) {
-
-                        DayOfWeek secondRouteEndDay = secondRouteStartDay.plus(
-                                secondRoute.getArrivalTime().contains("(+1d)") ? 1 : 0);
-
-                        double secondChangeDuration = DateTimeUtils.calculateDateTimeDifferenceInHours(
-                                secondRouteStartDay,
-                                secondRoute.getArrivalTime(),
-                                thirdRouteDay,
-                                thirdRoute.getDepartureTime());
-                        Layover secondLayover = new Layover(secondRoute, thirdRoute, secondRouteStartDay,
-                                secondRouteEndDay, thirdRouteDay,
-                                secondChangeDuration);
-
-                        layoverCombinations.add(new Layover[] { layover, secondLayover });
-                    }
-                } else {
-                    layoverCombinations.add(new Layover[] { layover });
-                }
-
-            }
-
-        }
-
-        double shortestLayoverDuration = Double.MAX_VALUE;
-        Layover[] bestCombination = null;
-        for (Layover[] currentLayovers : layoverCombinations) {
-            double totalChangeDuration = 0;
-            for (Layover layover : currentLayovers) {
-                totalChangeDuration += layover.getLayoverDuration();
-            }
-            if (totalChangeDuration < shortestLayoverDuration) {
-                shortestLayoverDuration = totalChangeDuration;
-                bestCombination = currentLayovers;
-            }
-        }
-
-        return bestCombination;
-    }
 
     public List<Route> getRoutes() {
         return routes;
