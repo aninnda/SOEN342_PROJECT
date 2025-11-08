@@ -15,6 +15,7 @@ import type {
 import {
   formatDuration,
   getDisplayNameForDaysOfOperation,
+  toIndex,
 } from "../../utils/dateUtils";
 import BookingModal from "../BookingModal";
 
@@ -33,13 +34,26 @@ export default function IndirectConnectionTable(
 ) {
   const [isBookingDialogOpen, setIsBookingDialogOpen] = useState(false);
   const [selectedRouteIds, setSelectedRouteIds] = useState<string[]>([]);
+
+  function getConnectionId(connection: ConnectionModel): string {
+    return (
+      connection.routes.map((route) => route.routeId).join("-") +
+      ":" +
+      (connection.layovers
+        ? connection.layovers
+            .map((layover) => `${toIndex(layover.startDepDay)}`)
+            .join("-") +
+          "-" +
+          toIndex(connection.layovers[connection.layovers.length - 1].endArrDay)
+        : "")
+    );
+  }
+
   const extendedRoutes = useMemo<ExtendedRouteModel[]>(() => {
     const routes: ExtendedRouteModel[] = [];
 
     props.data.forEach((connection) => {
-      const connectionId = connection.routes
-        .map((route) => route.routeId)
-        .join("-");
+      const connectionId = getConnectionId(connection);
       connection.routes.forEach((route) => {
         routes.push({
           ...route,
@@ -64,8 +78,7 @@ export default function IndirectConnectionTable(
           const route = row.original as ExtendedRouteModel;
           // Find the full connection for this route
           const connection = props.data.find(
-            (conn) =>
-              route.connectionId === conn.routes.map((r) => r.routeId).join("-")
+            (conn) => route.connectionId === getConnectionId(conn)
           );
           const routeIds = connection
             ? connection.routes.map((r) => r.routeId)
@@ -100,7 +113,7 @@ export default function IndirectConnectionTable(
             props.data.find(
               (conn) =>
                 connectionId ===
-                conn.routes.map((route) => route.routeId).join("-")
+                getConnectionId(conn)
             )?.routes ?? [];
 
           const cities = new Set<string>(routes.map((r) => r.departureCity));
@@ -201,14 +214,14 @@ export default function IndirectConnectionTable(
               return `Layover ${index + 1}: Depart ${
                 layover.startRoute.departureCity
               } (${layover.startRoute.departureTime}, ${
-                layover.firstRouteStartDay
+                layover.startDepDay
               }), Arrive ${layover.startRoute.arrivalCity} (${
                 layover.startRoute.arrivalTime
-              }, ${layover.firstRouteEndDay}), then wait ${formatDuration(
-                layover.layoverDuration
+              }, ${layover.startArrDay}), then wait ${formatDuration(
+                layover.duration
               )} for the next train to ${layover.endRoute.arrivalCity} (${
                 layover.endRoute.departureTime
-              }, ${layover.secondRouteStartDay})`;
+              }, ${layover.endDepDay})`;
             })
             .join("\n");
 

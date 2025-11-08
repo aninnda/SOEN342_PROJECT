@@ -21,8 +21,8 @@ Not only is the user's preferred date-time of arrival/departure ignored, but als
 ## Policy
 
 Returned indirect connections will contain layovers that are:
-- no longer than 2 hours long, if the layover starts between 7 pm to 5 am (exclusive).
-- no longer than 5 hours long, if the layover starts between 5 am to 7 pm (inclusive).
+- no longer than 1 hour long, if the layover starts between 7 pm to 5 am (exclusive).
+- no longer than 3 hours long, if the layover starts between 5 am to 7 pm (inclusive).
 
 For connections with more than a single layover, the policy must apply to both layovers for it to be suggested.
 
