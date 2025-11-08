@@ -1,5 +1,6 @@
 package soen342.project.service;
 
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +8,11 @@ import java.util.stream.Collectors;
 
 import soen342.project.data.RouteRepository;
 import soen342.project.model.Connection;
+import soen342.project.model.Layover;
 import soen342.project.model.Route;
 import soen342.project.model.Requests.SearchCriteria;
 import soen342.project.model.Responses.SearchResponseModel;
+import soen342.project.util.LayoverUtils;
 
 public class SearchService {
     public SearchResponseModel search(SearchCriteria criteria) {
@@ -63,9 +66,10 @@ public class SearchService {
     private List<Connection> searchOneStops(SearchCriteria criteria) {
 
         List<Connection> oneStopConnections = new ArrayList<>();
-        List<Route> candidateStartRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
-        List<Route> candidateEndRoutes = RouteRepository.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
-
+        List<Route> candidateStartRoutes = RouteRepository.getInstance()
+                .getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = RouteRepository.getInstance()
+                .getRoutesByArrivalCity(criteria.getArrivalCity());
         List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
                 criteria.getDepartureCity(),
                 null,
@@ -75,27 +79,38 @@ public class SearchService {
                 criteria.getMaxFirstClassPrice(),
                 criteria.getMaxSecondClassPrice(),
                 criteria.getDayOfWeek()));
-
         List<Route> filteredCandidateEndRoutes = filterRoutes(candidateEndRoutes, new SearchCriteria(
                 null,
                 criteria.getArrivalCity(),
                 null,
-                criteria.getArrivalTime(), // maybe we ignore this for indirects
+                criteria.getArrivalTime(),
                 criteria.getTrainType(),
                 criteria.getMaxFirstClassPrice(),
                 criteria.getMaxSecondClassPrice(),
                 null));
 
+        List<Route[]> routeMatches = new ArrayList<>();
         for (Route start : filteredCandidateStartRoutes) {
             for (Route end : filteredCandidateEndRoutes) {
                 // Ensure the arrival city of the start route matches the departure city of the
                 // end route
                 if (start.getArrivalCity().equalsIgnoreCase(end.getDepartureCity())) {
-                    // Ensure the arrival time of the start route is before the departure time of
-                    // the end route
-                    oneStopConnections.add(new Connection(List.of(start, end)));
+                    routeMatches.add(new Route[] { start, end });
                 }
             }
+        }
+
+        for (Route[] match : routeMatches) {
+            List<DayOfWeek> possibleStartDays = criteria.getDayOfWeek() == null ? match[0].getDaysOfOperation()
+                    : List.of(criteria.getDayOfWeek());
+            for (DayOfWeek startDay : possibleStartDays) {
+
+                List<Layover> validLayovers = LayoverUtils.getValidLayovers(match[0], match[1], startDay);
+                for (Layover layover : validLayovers) {
+                    oneStopConnections.add(new Connection(List.of(match[0], match[1]), new Layover[] { layover }));
+                }
+            }
+
         }
 
         return oneStopConnections;
@@ -104,8 +119,10 @@ public class SearchService {
     private List<Connection> searchTwoStops(SearchCriteria criteria) {
 
         List<Connection> twoStopConnections = new ArrayList<>();
-        List<Route> candidateStartRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(criteria.getDepartureCity());
-        List<Route> candidateEndRoutes = RouteRepository.getInstance().getRoutesByArrivalCity(criteria.getArrivalCity());
+        List<Route> candidateStartRoutes = RouteRepository.getInstance()
+                .getRoutesByDepartureCity(criteria.getDepartureCity());
+        List<Route> candidateEndRoutes = RouteRepository.getInstance()
+                .getRoutesByArrivalCity(criteria.getArrivalCity());
 
         List<Route> filteredCandidateStartRoutes = filterRoutes(candidateStartRoutes, new SearchCriteria(
                 criteria.getDepartureCity(),
@@ -127,9 +144,10 @@ public class SearchService {
                 criteria.getMaxSecondClassPrice(),
                 null));
 
-        for (Route firstRoute : filteredCandidateStartRoutes) {
-            for (Route lastRoute : filteredCandidateEndRoutes) {
-                List<Route> middleRoutes = RouteRepository.getInstance().getRoutesByDepartureCity(firstRoute.getArrivalCity());
+        for (Route startRoute : filteredCandidateStartRoutes) {
+            for (Route endRoute : filteredCandidateEndRoutes) {
+                List<Route> middleRoutes = RouteRepository.getInstance()
+                        .getRoutesByDepartureCity(startRoute.getArrivalCity());
                 List<Route> filteredMiddleRoutes = filterRoutes(middleRoutes, new SearchCriteria(
                         null,
                         null,
@@ -139,18 +157,30 @@ public class SearchService {
                         criteria.getMaxFirstClassPrice(),
                         criteria.getMaxSecondClassPrice(),
                         null));
-                for (Route middleRoute : filteredMiddleRoutes) {
-                    if (firstRoute.getArrivalCity().equalsIgnoreCase(middleRoute.getDepartureCity()) &&
-                            middleRoute.getArrivalCity().equalsIgnoreCase(lastRoute.getDepartureCity())) {
-                        twoStopConnections.add(new Connection(List.of(firstRoute, middleRoute, lastRoute)));
-                    }
-                }
+                List<DayOfWeek> possibleStartDays = criteria.getDayOfWeek() == null ? startRoute.getDaysOfOperation()
+                        : List.of(criteria.getDayOfWeek());
 
+                for (Route middleRoute : filteredMiddleRoutes) {
+                    for (DayOfWeek startDay : possibleStartDays) {
+
+                        List<Layover> firstLegLayovers = LayoverUtils.getValidLayovers(startRoute, middleRoute,
+                                startDay);
+                        for (Layover firstLegLayover : firstLegLayovers) {
+                            List<Layover> secondLegLayovers = LayoverUtils.getValidLayovers(middleRoute, endRoute,
+                                    firstLegLayover.getEndDepDay());
+                            for (Layover secondLegLayover : secondLegLayovers) {
+                                twoStopConnections.add(new Connection(
+                                        List.of(startRoute, middleRoute, endRoute),
+                                        new Layover[] { firstLegLayover, secondLegLayover }));
+                            }
+                        }
+
+                    }
+
+                }
             }
         }
-
         return twoStopConnections;
-
     }
 
     // filtering the routes based on the criteria provided by the user

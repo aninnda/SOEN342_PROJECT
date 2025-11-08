@@ -150,8 +150,8 @@ public class DateTimeUtils {
 
         boolean isStartTimeAfterEndTime = LocalTime.parse(startTimeCleaned).isAfter(LocalTime.parse(endTimeCleaned));
 
-        String[] startParts = startTime.replace("(+1d)", "").split(":");
-        String[] endParts = endTime.split(":");
+        String[] startParts = startTimeCleaned.split(":");
+        String[] endParts = endTimeCleaned.split(":");
 
         int startHour = Integer.parseInt(startParts[0]);
         int startMinute = Integer.parseInt(startParts[1]);
@@ -168,6 +168,16 @@ public class DateTimeUtils {
 
         int differenceInMinutes = totalEndMinutes - totalStartMinutes;
         return differenceInMinutes / 60.0;
+    }
+
+    public static DayOfWeek getAdjustedDayOfWeek(DayOfWeek routeDayOfWeek, String time) {
+        int dayOffset = 0;
+        if (time.contains("(+1d)")) {
+            dayOffset = 1;
+        }
+        int adjustedDayOrdinal = (routeDayOfWeek.ordinal() + dayOffset) % 7;
+
+        return DayOfWeek.of(adjustedDayOrdinal + 1);
     }
 
 }
