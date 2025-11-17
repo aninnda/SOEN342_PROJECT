@@ -1,0 +1,86 @@
+@startuml UC-02-BookTrip-StateMachine
+skinparam state {
+    BackgroundColor<<error>> LightCoral
+    BackgroundColor<<success>> LightGreen
+}
+
+[*] --> Idle : System Ready
+
+Idle --> AwaitingInput : User initiates booking
+
+AwaitingInput : Entry / Display booking form
+AwaitingInput : Do / Collect traveler info\nand connection details
+AwaitingInput --> ValidatingInput : User submits booking
+
+ValidatingInput : Entry / Validate input data
+ValidatingInput --> InputError <<error>> : Invalid data\n(missing fields,\ninvalid format)
+ValidatingInput --> ValidatingRoutes : Input valid
+
+InputError : Entry / Display error message
+InputError --> AwaitingInput : User corrects input
+InputError --> Idle : User cancels
+
+ValidatingRoutes : Entry / Check route IDs exist
+ValidatingRoutes --> RouteError <<error>> : Route ID not found
+ValidatingRoutes --> ValidatingLayovers : All routes valid
+
+RouteError : Entry / Display route error
+RouteError --> AwaitingInput : User modifies routes
+RouteError --> Idle : User cancels
+
+ValidatingLayovers : Entry / Check layover policy
+ValidatingLayovers : Do / Validate connection\nlayover durations
+ValidatingLayovers --> LayoverError <<error>> : Policy violation\n(excessive layover)
+ValidatingLayovers --> ProcessingTravelers : Layovers compliant
+
+LayoverError : Entry / Display policy violation
+LayoverError --> AwaitingInput : User selects different connection
+LayoverError --> Idle : User cancels
+
+ProcessingTravelers : Entry / Begin transaction
+ProcessingTravelers : Do / Upsert traveler records
+ProcessingTravelers --> CreatingTrip : Travelers saved
+
+CreatingTrip : Entry / Create Trip entity
+CreatingTrip : Do / Persist trip with routes
+CreatingTrip --> LinkingTravelers : Trip created
+
+LinkingTravelers : Entry / Associate travelers
+LinkingTravelers : Do / Populate trip_travelers table
+LinkingTravelers --> IssuingTickets : Travelers linked
+
+IssuingTickets : Entry / Generate tickets
+IssuingTickets : Do / Create one ticket per traveler\nwith issued timestamp
+IssuingTickets --> CommittingTransaction : All tickets created
+
+CommittingTransaction : Entry / Commit transaction
+CommittingTransaction --> DatabaseError <<error>> : DB write failure
+CommittingTransaction --> BookingComplete <<success>> : Transaction committed
+
+DatabaseError : Entry / Rollback transaction
+DatabaseError : Do / Log error
+DatabaseError --> Idle : Display error / Retry
+
+BookingComplete : Entry / Generate response
+BookingComplete : Do / Return trip ID,\nticket IDs, success message
+BookingComplete --> DisplayingConfirmation <<success>> : Response sent
+
+DisplayingConfirmation : Entry / Show confirmation
+DisplayingConfirmation : Do / Display trip details,\nticket numbers
+DisplayingConfirmation --> Idle : User acknowledges
+
+note right of ValidatingLayovers
+  Policy Rules:
+  - Daytime (06:00-22:00): max 2h layover
+  - Nighttime (22:00-06:00): max 30min layover
+end note
+
+note right of IssuingTickets
+  One ticket per traveler:
+  - Links traveler to trip
+  - Records issuedAt timestamp
+  - Ensures no duplicates
+end note
+DisplayingConfirmation --> [*] : User acknowledges
+
+@enduml
