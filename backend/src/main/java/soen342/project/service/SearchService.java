@@ -14,6 +14,8 @@ import soen342.project.model.Requests.SearchCriteria;
 import soen342.project.model.Responses.SearchResponseModel;
 import soen342.project.util.LayoverUtils;
 
+import soen342.project.util.SearchCriteriaUtils;
+
 public class SearchService {
     public SearchResponseModel search(SearchCriteria criteria) {
         List<Connection> connections = new ArrayList<>();
@@ -186,99 +188,14 @@ public class SearchService {
     // filtering the routes based on the criteria provided by the user
     private List<Route> filterRoutes(List<Route> routes, SearchCriteria criteria) {
         return routes.stream()
-                .filter(route -> matchesDepartureCity(route, criteria))
-                .filter(route -> matchesArrivalCity(route, criteria))
-                .filter(route -> matchesDepartureTime(route, criteria))
-                .filter(route -> matchesArrivalTime(route, criteria))
-                .filter(route -> matchesTrainType(route, criteria))
-                .filter(route -> matchesDayOfOperation(route, criteria))
-                .filter(route -> matchesMaxPrice(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesDepartureCity(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesArrivalCity(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesDepartureTime(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesArrivalTime(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesTrainType(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesDayOfOperation(route, criteria))
+                .filter(route -> SearchCriteriaUtils.matchesMaxPrice(route, criteria))
                 .collect(Collectors.toList());
-    }
-
-    private boolean matchesDepartureCity(Route route, SearchCriteria criteria) {
-        if (criteria.getDepartureCity() == null || criteria.getDepartureCity().trim().isEmpty()) {
-            return true;
-        }
-        return route.getDepartureCity() != null &&
-                route.getDepartureCity().toLowerCase().contains(criteria.getDepartureCity().toLowerCase().trim());
-    }
-
-    private boolean matchesArrivalCity(Route route, SearchCriteria criteria) {
-        if (criteria.getArrivalCity() == null || criteria.getArrivalCity().trim().isEmpty()) {
-            return true;
-        }
-        return route.getArrivalCity() != null &&
-                route.getArrivalCity().toLowerCase().contains(criteria.getArrivalCity().toLowerCase().trim());
-    }
-
-    private boolean matchesDepartureTime(Route route, SearchCriteria criteria) {
-        if (criteria.getDepartureTime() == null || criteria.getDepartureTime().trim().isEmpty()) {
-            return true;
-        }
-        try {
-            LocalTime routeDepartureTime = LocalTime.parse(route.getDepartureTime());
-            LocalTime criteriaTime = LocalTime.parse(criteria.getDepartureTime());
-            return routeDepartureTime.equals(criteriaTime) ||
-                    routeDepartureTime.isAfter(criteriaTime);
-        } catch (Exception e) {
-            // If parsing fails, assume it matches to avoid filtering out valid routes
-            return true;
-        }
-    }
-
-    private boolean matchesArrivalTime(Route route, SearchCriteria criteria) {
-        if (criteria.getArrivalTime() == null || criteria.getArrivalTime().trim().isEmpty()) {
-            return true;
-        }
-        try {
-            LocalTime routeArrivalTime = LocalTime.parse(route.getArrivalTime());
-            LocalTime criteriaTime = LocalTime.parse(criteria.getArrivalTime());
-            return routeArrivalTime.equals(criteriaTime) ||
-                    routeArrivalTime.isBefore(criteriaTime);
-        } catch (Exception e) {
-            // If parsing fails, assume it matches to avoid filtering out valid routes
-            return true;
-        }
-    }
-
-    private boolean matchesTrainType(Route route, SearchCriteria criteria) {
-        if (criteria.getTrainType() == null || criteria.getTrainType().trim().isEmpty()) {
-            return true;
-        }
-        return route.getTrainType() != null &&
-                route.getTrainType().toLowerCase().contains(criteria.getTrainType().toLowerCase().trim());
-    }
-
-    private boolean matchesDayOfOperation(Route route, SearchCriteria criteria) {
-        if (criteria.getDayOfWeek() == null) {
-            return true;
-        }
-        return route.getDaysOfOperation() != null &&
-                route.getDaysOfOperation().contains(criteria.getDayOfWeek());
-    }
-
-    private boolean matchesMaxPrice(Route route, SearchCriteria criteria) {
-        boolean firstClassMatch = true;
-        boolean secondClassMatch = true;
-
-        // Check first class price filter
-        if (criteria.getMaxFirstClassPrice() > 0) {
-            firstClassMatch = route.getFirstClassTicketRate() <= criteria.getMaxFirstClassPrice();
-        }
-
-        // Check second class price filter
-        if (criteria.getMaxSecondClassPrice() > 0) {
-            secondClassMatch = route.getSecondClassTicketRate() <= criteria.getMaxSecondClassPrice();
-        }
-
-        // If no price filters specified, match all
-        if (criteria.getMaxFirstClassPrice() <= 0 && criteria.getMaxSecondClassPrice() <= 0) {
-            return true;
-        }
-
-        // Route matches if it satisfies the specified price constraints
-        return firstClassMatch && secondClassMatch;
     }
 
     // City suggestion methods
