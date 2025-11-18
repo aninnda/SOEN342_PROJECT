@@ -133,7 +133,7 @@ export default function BookingModal({
             onChange={(value) => setDepartureDate(value as Dayjs)}
             shouldDisableDate={(day) =>
               connection?.routes[0].daysOfOperation
-                .map(toIndex)
+                .map((dayOfOp) => (toIndex(dayOfOp) + 1) % 7)
                 .includes(day.day()) === false
             }
           />

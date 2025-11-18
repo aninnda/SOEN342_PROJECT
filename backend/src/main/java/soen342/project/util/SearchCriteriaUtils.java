@@ -60,7 +60,7 @@ public class SearchCriteriaUtils {
             return true;
         }
         return route.getTrainType() != null &&
-                route.getTrainType().toLowerCase().contains(criteria.getTrainType().toLowerCase().trim());
+                route.getTrainType().toLowerCase().equals(criteria.getTrainType().toLowerCase().trim());
     }
 
     public static boolean matchesDayOfOperation(Route route, SearchCriteria criteria) {

@@ -166,7 +166,7 @@ function SearchInterface(props: SearchInterfaceProps) {
                 value={filters.departureTime ?? null}
                 fullWidth
                 ampm={false}
-                label="Departure Time"
+                label="Departure Time (earliest)"
                 error={
                   !!filters.departureTime && !filters.departureTime.isValid()
                 }
@@ -180,7 +180,7 @@ function SearchInterface(props: SearchInterfaceProps) {
                 value={filters.arrivalTime ?? null}
                 fullWidth
                 ampm={false}
-                label="Arrival Time"
+                label="Arrival Time (latest)"
                 error={!!filters.arrivalTime && !filters.arrivalTime.isValid()}
                 parentOnChange={(newTime: Dayjs | null) => {
                   dispatch({ type: "arrivalTime", payload: newTime });
