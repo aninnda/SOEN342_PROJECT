@@ -1,7 +1,9 @@
 package soen342.project.util;
 
 import java.time.LocalTime;
+import java.util.List;
 
+import soen342.project.model.Connection;
 import soen342.project.model.Route;
 import soen342.project.model.Requests.SearchCriteria;
 
@@ -90,6 +92,16 @@ public class SearchCriteriaUtils {
 
         // Route matches if it satisfies the specified price constraints
         return firstClassMatch && secondClassMatch;
+    }
+
+    public static void filterForIndirectMaxPrices(List<Connection> connections, SearchCriteria criteria) {
+        connections.removeIf(connection -> {
+            boolean firstClassExceeds = criteria.getMaxFirstClassPrice() > 0 &&
+                    connection.getTotalFirstClassTicketRate() > criteria.getMaxFirstClassPrice();
+            boolean secondClassExceeds = criteria.getMaxSecondClassPrice() > 0 &&
+                    connection.getTotalSecondClassTicketRate() > criteria.getMaxSecondClassPrice();
+            return firstClassExceeds || secondClassExceeds;
+        });
     }
 
 }

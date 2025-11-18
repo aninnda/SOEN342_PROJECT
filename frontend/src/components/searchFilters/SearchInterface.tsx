@@ -262,7 +262,7 @@ function SearchInterface(props: SearchInterfaceProps) {
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
             <FormControl fullWidth>
-              <InputLabel>Day of Week</InputLabel>
+              <InputLabel>Day of Week (Departure)</InputLabel>
               <Select
                 IconComponent={(props) => {
                   return filters.dayOfWeek ? (

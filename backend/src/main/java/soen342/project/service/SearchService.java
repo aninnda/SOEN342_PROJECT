@@ -59,6 +59,9 @@ public class SearchService {
         List<Connection> oneStopConnections = searchOneStops(criteria);
         List<Connection> twoStopConnections = searchTwoStops(criteria);
 
+        SearchCriteriaUtils.filterForIndirectMaxPrices(oneStopConnections, criteria);
+        SearchCriteriaUtils.filterForIndirectMaxPrices(twoStopConnections, criteria);
+
         indirectConnections.addAll(oneStopConnections);
         indirectConnections.addAll(twoStopConnections);
 
