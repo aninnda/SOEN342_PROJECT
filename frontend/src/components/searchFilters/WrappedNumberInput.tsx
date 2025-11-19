@@ -35,7 +35,7 @@ export function WrappedNumberInput(props: Props) {
       value={value}
       type="number"
       onBlur={handleBlur}
-      label="Max First Class Price (€)"
+      label={rest.label}
       onChange={handleChange}
     />
   );

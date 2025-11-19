@@ -69,7 +69,7 @@ export default function TripsView() {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <Button type="submit" variant="contained" startIcon={<SearchIcon />}>
+          <Button disabled={identifier === "" || name === ""} type="submit" variant="contained" startIcon={<SearchIcon />}>
             Search
           </Button>
         </Paper>
@@ -78,8 +78,7 @@ export default function TripsView() {
         <Paper elevation={3} sx={{ p: 2, width: "100%" }}>
           {showPlaceholder ? (
             <Box>
-              Enter your traveler ID or your trip reference number to view trip
-              information.
+              Enter your traveler ID and last name to view your trips.
             </Box>
           ) : (
             <TripResults

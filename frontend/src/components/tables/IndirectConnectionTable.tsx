@@ -110,11 +110,8 @@ export default function IndirectConnectionTable(
           const connectionId = row.original.connectionId;
 
           const routes =
-            props.data.find(
-              (conn) =>
-                connectionId ===
-                getConnectionId(conn)
-            )?.routes ?? [];
+            props.data.find((conn) => connectionId === getConnectionId(conn))
+              ?.routes ?? [];
 
           const cities = new Set<string>(routes.map((r) => r.departureCity));
 
@@ -194,42 +191,65 @@ export default function IndirectConnectionTable(
         header: "Connection Change Duration",
         accessorKey: "connectionChangeDuration",
         aggregationFn: "max",
-        AggregatedCell: ({ cell }) => formatDuration(cell.getValue() as number),
+        Cell: ({ cell }) => {
+          return "";
+        },
         enableSorting: true,
         enableGrouping: false,
         Header: () => (
           <Box display="flex" alignItems="center">
             Connection Change Duration
             <Tooltip
-              title=" Connection change duration is calculated as the shortest time spent waiting at each layover, with ideal departure days.
-              Day and time filters do not affect these values."
+              title={
+                <Box display="flex" flexDirection="column" gap={1}>
+                  <Box>
+                    Displayed indirect connections will contain layovers that:
+                  </Box>
+                  <Box>
+                    are no longer than 1 hour long, if the layover starts between 7
+                    pm to 5 am (exclusive).
+                  </Box>
+                  <Box>
+                    are no longer than 3 hours long, if the layover starts between 5
+                    am to 7 pm (inclusive).
+                  </Box>
+                </Box>
+              }
             >
               <InfoIcon color="warning" />
             </Tooltip>
           </Box>
         ),
-        Cell: ({ row }: { row: MRT_Row<ExtendedRouteModel> }) => {
-          const tooltipText = row.original.layovers
-            ?.map((layover: LayoverModel, index: number) => {
+        AggregatedCell: ({ row }: { row: MRT_Row<ExtendedRouteModel> }) => {
+          const tooltipText = row.original.layovers?.map(
+            (layover: LayoverModel, index: number) => {
               return `Layover ${index + 1}: Depart ${
                 layover.startRoute.departureCity
-              } (${layover.startRoute.departureTime}, ${
+              } (at ${layover.startRoute.departureTime}, ${
                 layover.startDepDay
-              }), Arrive ${layover.startRoute.arrivalCity} (${
+              }), then arrive at ${layover.startRoute.arrivalCity} (${
                 layover.startRoute.arrivalTime
               }, ${layover.startArrDay}), then wait ${formatDuration(
                 layover.duration
               )} for the next train to ${layover.endRoute.arrivalCity} (${
                 layover.endRoute.departureTime
               }, ${layover.endDepDay})`;
-            })
-            .join("\n");
+            }
+          );
 
           return (
             <Box gap={1} display="flex">
               {formatDuration(row.original.connectionChangeDuration as number)}
 
-              <Tooltip title={tooltipText}>
+              <Tooltip
+                title={
+                  <Box display="flex" flexDirection="column" gap={1}>
+                    {tooltipText?.map((text) => {
+                      return <Box>{text}</Box>;
+                    })}
+                  </Box>
+                }
+              >
                 <InfoIcon />
               </Tooltip>
             </Box>

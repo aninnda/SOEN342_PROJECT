@@ -2,17 +2,13 @@ import {
   Box,
   CircularProgress,
   List,
-  ListItem,
-  ListItemText,
   Tab,
   Tabs,
-  Typography,
+  Typography
 } from "@mui/material";
-import type { Dayjs } from "dayjs";
 import dayjs from "dayjs";
 import { useState } from "react";
 import type { DetailedTripModel } from "../../models/models";
-import { formatDuration } from "../../utils/dateUtils";
 import SingleTripResult from "./SingleTripResult";
 
 type Props = {
@@ -22,21 +18,29 @@ type Props = {
 };
 
 export function TripResults(props: Props) {
-  const pastResults = props.results?.filter((trip) => {
-    const departureDate = dayjs(trip.initialDepartureDate);
-    return departureDate.isBefore(dayjs().startOf("day"), "day");
-  });
-  const futureResults = props.results?.filter((trip) => {
-    const departureDate = dayjs(trip.initialDepartureDate);
-    return (
-      departureDate.isAfter(dayjs().startOf("day")) ||
-      departureDate.isSame(dayjs(), "day")
-    );
-  }).sort((a, b) => {
-    const dateA = dayjs(a.initialDepartureDate);
-    const dateB = dayjs(b.initialDepartureDate);
-    return dateA.diff(dateB);
-  });
+  const pastResults = props.results
+    ?.filter((trip) => {
+      const departureDate = dayjs(trip.initialDepartureDate);
+      return departureDate.isBefore(dayjs().startOf("day"), "day");
+    })
+    .sort((a, b) => { // most recent first
+      const dateA = dayjs(a.initialDepartureDate);
+      const dateB = dayjs(b.initialDepartureDate);
+      return dateB.diff(dateA);
+    });
+  const futureResults = props.results
+    ?.filter((trip) => {
+      const departureDate = dayjs(trip.initialDepartureDate);
+      return (
+        departureDate.isAfter(dayjs().startOf("day")) ||
+        departureDate.isSame(dayjs(), "day")
+      );
+    })
+    .sort((a, b) => { // soonest first  
+      const dateA = dayjs(a.initialDepartureDate);
+      const dateB = dayjs(b.initialDepartureDate);
+      return dateA.diff(dateB);
+    });
 
   const [selectedTab, setSelectedTab] = useState<number>(0);
 
@@ -54,13 +58,16 @@ export function TripResults(props: Props) {
             value={selectedTab}
             onChange={(_, newValue) => setSelectedTab(newValue)}
           >
-            {!!futureResults?.length && <Tab label="Upcoming" />}
-            {!!pastResults?.length && <Tab label="Past" />}
+            <Tab label="Upcoming" />
+            <Tab label="Past" />
           </Tabs>
           <div role="tabpanel" hidden={selectedTab !== 0} id={"tabpanel-0"}>
             <Typography variant="h6" sx={{ mt: 2 }}>
               Upcoming Trips
             </Typography>
+            {futureResults?.length === 0 && (
+              <Typography sx={{ mt: 3 }}>No upcoming trips found.</Typography>
+            )}
             <List>
               {futureResults?.map((item) => (
                 <SingleTripResult key={item.id} trip={item} />
@@ -72,6 +79,9 @@ export function TripResults(props: Props) {
             <Typography variant="h6" sx={{ mt: 2 }}>
               Past Trips
             </Typography>
+            {pastResults?.length === 0 && (
+              <Typography sx={{ mt: 3 }}>No past trips found.</Typography>
+            )}
             <List>
               {pastResults?.map((item) => (
                 <SingleTripResult key={item.id} trip={item} />

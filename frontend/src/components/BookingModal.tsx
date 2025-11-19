@@ -45,6 +45,23 @@ export default function BookingModal({
 
   const [tripId, setTripId] = useState<string | null>(null);
 
+  const shouldDisableConfirm = () => {
+
+    if (!departureDate) return true;
+
+    for (const traveler of travelers) {
+      if (
+        !traveler.firstName ||
+        !traveler.lastName ||
+        traveler.age === "" ||
+        !traveler.id
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   function resetAndClose() {
     setNumTravelers(1);
     setTravelers([{ id: "", firstName: "", lastName: "", age: "" }]);
@@ -133,7 +150,7 @@ export default function BookingModal({
             onChange={(value) => setDepartureDate(value as Dayjs)}
             shouldDisableDate={(day) =>
               connection?.routes[0].daysOfOperation
-                .map(toIndex)
+                .map((dayOfOp) => (toIndex(dayOfOp) + 1) % 7)
                 .includes(day.day()) === false
             }
           />
@@ -203,7 +220,7 @@ export default function BookingModal({
             <Button
               variant="contained"
               onClick={handleSubmit}
-              disabled={loading}
+              disabled={loading || shouldDisableConfirm()}
             >
               Confirm
             </Button>

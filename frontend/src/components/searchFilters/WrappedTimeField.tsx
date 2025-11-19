@@ -30,12 +30,15 @@ export default function WrappedTimeField(props: Props) {
     if (value) parentOnChange(value);
   };
 
-
   return (
     <TimeField
       {...rest}
       value={value}
       onChange={handleChange}
+      onClear={() => {
+        handleChange(null);
+        parentOnChange(null);
+      }}
       onBlur={handleBlur}
       clearable
     />
