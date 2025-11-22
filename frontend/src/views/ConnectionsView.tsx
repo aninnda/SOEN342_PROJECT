@@ -32,7 +32,7 @@ export default function ConnectionsView() {
       }}
     >
       {!hasSearched && (
-        <Typography variant="h3" align="center" gutterBottom>
+        <Typography variant="h3" align="center" gutterBottom sx={{pt: 10}}>
           Choose your next travel destination!
         </Typography>
       )}

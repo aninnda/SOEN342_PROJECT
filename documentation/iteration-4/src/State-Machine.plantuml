@@ -1,0 +1,91 @@
+@startuml UC-02-BookTrip-StateMachine
+skinparam state {
+    BackgroundColor<<error>> LightCoral
+    BackgroundColor<<success>> LightGreen
+}
+
+[*] --> Idle
+
+Idle: Do / Display connections search result 
+Idle --> AwaitingInput : User initiates booking
+
+AwaitingInput : Entry / Display booking form
+AwaitingInput : Do / Collect traveler info\nand connection details
+AwaitingInput --> ValidatingInput : User submits booking
+AwaitingInput --> Idle: cancel / clear data
+
+ValidatingInput : Entry / Validate input data
+ValidatingInput --> InputError <<error>> :  displayInputError \n[inputData is invalid] / display error message
+ValidatingInput --> Processing : Input valid
+
+InputError : Entry / Display error toast
+InputError : Do / highlight erroneous fields
+InputError --> AwaitingInput : User changes input
+
+
+state Processing {
+    Processing: Entry / Start new transaction
+    Processing: Exit / End transaction
+
+    [*] --> ProcessingTravelers
+
+    state ProcessingTravelers {
+
+        state TravelerUpsertStrategy <<choice>>
+
+        [*] --> TravelerUpsertStrategy
+        TravelerUpsertStrategy --> InsertingTraveler: [traveler IDs do not exist]
+        TravelerUpsertStrategy --> UpdatingTraveler: [traveler IDs already exists]
+
+        InsertingTraveler: Do / insert new travelers
+
+        InsertingTraveler --> [*]
+
+        UpdatingTraveler: Do / update existing travelers
+
+        UpdatingTraveler --> [*]
+
+    }
+    ProcessingTravelers --> CreatingTrip: travelers saved
+
+    CreatingTrip : Entry / Create Trip entity
+    CreatingTrip : Do / Persist trip with routes
+    CreatingTrip --> LinkingTravelers : Trip created
+
+    LinkingTravelers : Entry / Associate travelers
+    LinkingTravelers : Do / Populate trip_travelers table
+    LinkingTravelers --> IssuingTickets : Travelers linked
+
+    IssuingTickets : Entry / Generate tickets
+    IssuingTickets : Do / Create one ticket per traveler\nwith issued timestamp
+    IssuingTickets --> CommittingTransaction : All tickets created
+
+    CommittingTransaction : Entry / Commit transaction
+    CommittingTransaction --> DBError <<exitPoint>>: DB write error
+    CommittingTransaction --> [*]
+    
+    note right of IssuingTickets
+    One ticket per traveler:
+    - Links traveler to trip
+    - Records issuedAt timestamp
+    - Ensures no duplicates
+    end note
+    
+}
+Processing --> BookingComplete <<success>> : Transaction committed
+
+DBError --> DatabaseError <<error>> 
+
+
+
+DatabaseError : Entry / Log error
+DatabaseError --> AwaitingInput : / Display error
+
+BookingComplete : Entry / Generate response
+BookingComplete : Do / Display confirmation
+BookingComplete --> Idle : User acknowledges
+
+
+BookingComplete --> [*] : View trips / open trips view page
+
+@enduml

@@ -54,17 +54,18 @@ public class TripService {
 
     private void createOrUpdateTravelers(List<Traveler> travelers) {
         if (travelers != null) {
-            for (var traveler : travelers) {
+            for (int i = 0; i < travelers.size(); i++) {
+                Traveler traveler = travelers.get(i);
                 var existing = travelerRepository.findByIdIgnoreCase(traveler.getId());
                 if (existing != null) {
                     // Update existing traveler
                     existing.setFirstName(traveler.getFirstName());
                     existing.setLastName(traveler.getLastName());
                     existing.setAge(traveler.getAge());
-                    travelerRepository.save(existing);
+                    travelers.set(i, travelerRepository.save(existing));
                 } else {
                     // Create new traveler
-                    travelerRepository.save(traveler);
+                    travelers.set(i, travelerRepository.save(traveler));
                 }
             }
         }
