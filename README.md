@@ -12,7 +12,9 @@ Team members
 You can view a 5 minute video demonstration of our app here: [https://youtu.be/B_bDgeERgyk](https://youtu.be/B_bDgeERgyk).
 
 ## Documentation
-Documentation, such as Use Case Models, Sequence Diagrams, and Domain Models can be found under [documentation](https://github.com/aninnda/SOEN342_PROJECT/blob/main/documentation/)
+Finalized documentation, such as Use Case Models, Sequence Diagrams, and Domain Models can be found under [documentation/all-final](https://github.com/aninnda/SOEN342_PROJECT/blob/main/documentation/all-final/).
+
+If you wish to view documentation created by iteration, see subfolders under [documentation](https://github.com/aninnda/SOEN342_PROJECT/blob/main/documentation/all-final/).
 
 ## Running instructions
 
